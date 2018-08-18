@@ -1,0 +1,15 @@
+server:
+  port: 80
+  servlet:
+    path: /es-management
+
+elasticsearch:
+  host: 49.4.9.225:9200
+  index:
+    user: user-filebeat
+    resources: res-filebeat
+    admin: admin-filebeat
+    system: system-filebeat
+    userAccess: user-access-count
+    userLogin: user-login-count
+    resourceAccess: res-access-count
