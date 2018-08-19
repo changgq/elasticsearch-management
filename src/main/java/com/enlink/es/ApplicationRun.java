@@ -39,13 +39,13 @@ public class ApplicationRun {
 
     public static void main(String[] args) {
         ApplicationContext ctx = SpringApplication.run(ApplicationRun.class, args);
-        RestHighLevelClient client = (RestHighLevelClient) ctx.getBean("elasticsearch");
-        try {
-            MainResponse response = client.info();
-            System.out.println(response.getClusterName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        RestHighLevelClient client = (RestHighLevelClient) ctx.getBean("elasticsearch");
+//        try {
+//            MainResponse response = client.info();
+//            System.out.println(response.getClusterName());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 }
 

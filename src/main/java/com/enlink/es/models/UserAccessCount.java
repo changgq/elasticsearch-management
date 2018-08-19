@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
-public class UserAccessCount {
+public class UserAccessCount extends GeneralModel {
     private String id;
     private String type;
     private String cycle;

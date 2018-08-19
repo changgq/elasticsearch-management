@@ -1,5 +1,6 @@
 package com.enlink.es.services.impl;
 
+import com.enlink.es.base.IndicesCreateInfo;
 import com.enlink.es.models.UserAccessCount;
 import com.enlink.es.services.UserAccessCountService;
 import org.elasticsearch.action.get.GetRequest;
@@ -17,7 +18,8 @@ import java.util.List;
  * @author changgq
  */
 @Service
-public class UserAccessCountServiceImpl implements UserAccessCountService {
+public class UserAccessCountServiceImpl extends GeneralAbstractServiceImpl<UserAccessCount> implements UserAccessCountService {
+
     @Value("${elasticsearch.index.userAccess}")
     private String userAccessIndex;
 
@@ -25,20 +27,17 @@ public class UserAccessCountServiceImpl implements UserAccessCountService {
     private RestHighLevelClient elasticsearch;
 
     @Override
-    public void createIndex() throws Exception {
-        // 判断索引是否存在
-        boolean isExists = elasticsearch.exists(new GetRequest(userAccessIndex));
-        if (!isExists) {
-            // 创建索引
-            elasticsearch.index(new IndexRequest(userAccessIndex).create(true));
-        }
+    public RestHighLevelClient getClient() throws Exception {
+        return elasticsearch;
+    }
+
+    @Override
+    public IndicesCreateInfo getIndicesCI() throws Exception {
+        return new IndicesCreateInfo.IndicesCIBuilder(userAccessIndex).create();
     }
 
     @Override
     public List<UserAccessCount> findByCycleType(String type, int top) throws Exception {
-        // 判断索引是否存在
-        boolean isExists = elasticsearch.exists(new GetRequest(userAccessIndex));
-
         return null;
     }
 }

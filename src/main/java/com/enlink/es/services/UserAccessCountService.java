@@ -9,15 +9,7 @@ import java.util.List;
  *
  * @author changgq
  */
-public interface UserAccessCountService {
-
-    /**
-     * 创建用户访问统计索引
-     *
-     * @throws Exception
-     */
-    public void createIndex() throws Exception;
-
+public interface UserAccessCountService extends GeneralService<UserAccessCount> {
     /**
      * 按周期类型查询用户访问数据top排行
      *

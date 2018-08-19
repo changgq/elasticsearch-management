@@ -36,7 +36,7 @@ public class IndicesCreateInfo {
         this.isAsync = builder.isAsync;
     }
 
-    private static class IndicesCIBuilder {
+    public static class IndicesCIBuilder {
         private final String name;
         private String type = "doc";
         private int number_of_shards = 1;

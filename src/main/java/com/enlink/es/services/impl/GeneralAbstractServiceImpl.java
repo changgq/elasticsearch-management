@@ -5,22 +5,25 @@ import com.enlink.es.base.IndicesCreateInfo;
 import com.enlink.es.base.PageData;
 import com.enlink.es.models.GeneralModel;
 import com.enlink.es.services.GeneralService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.IndicesRequest;
 import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.support.master.AcknowledgedRequest;
-import org.elasticsearch.client.Request;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> implements GeneralService {
+@Slf4j
+public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> implements GeneralService<T> {
 
     public abstract RestHighLevelClient getClient() throws Exception;
 
@@ -107,12 +110,12 @@ public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> impleme
                 getClient().indices().putMappingAsync(request, new ActionListener<PutMappingResponse>() {
                     @Override
                     public void onResponse(PutMappingResponse putMappingResponse) {
-
+                        putMappingsSuccess(putMappingResponse);
                     }
 
                     @Override
                     public void onFailure(Exception e) {
-
+                        putMappingsFailure();
                     }
                 });
             } else {
@@ -124,6 +127,17 @@ public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> impleme
 
     @Override
     public PageData<T> findByPaging(Condt condt, Integer pageIndex, Integer pageSize) throws Exception {
+        // 根据条件查询所有数据，超过10000条的记录，按照分页查询。
+        LOGGER.info("Indices Paging Search start ......");
+        SearchRequest searchRequest = new SearchRequest();
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        searchRequest.source(searchSourceBuilder);
+        LOGGER.debug("Elasticsearch Query : " + searchRequest.toString());
+        SearchResponse response = getClient().search(searchRequest);
+
+        LOGGER.debug("Elasticsearch Query results : " + response.getHits());
+        LOGGER.info("Indices Paging Search end!");
         return null;
     }
 }
