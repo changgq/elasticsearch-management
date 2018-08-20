@@ -4,11 +4,8 @@ import com.enlink.es.base.Condt;
 import com.enlink.es.base.IndicesCreateInfo;
 import com.enlink.es.base.PageData;
 import com.enlink.es.models.GeneralModel;
-import com.enlink.es.models.UserLoginCount;
 import com.enlink.es.services.GeneralService;
 import com.enlink.es.utils.DateUtils;
-import com.google.gson.GsonBuilder;
-import io.micrometer.core.instrument.search.Search;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.elasticsearch.action.ActionListener;
@@ -181,15 +178,7 @@ public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> impleme
 
     @Override
     public List<T> findByCycleType(Class<T> cls, Map<String, Object> conditions, String count_type, int top) throws Exception {
-        String cycle = "";
-        switch (count_type) {
-            case "day":
-                cycle = DateUtils.date2string(DateUtils.getYestoday());
-            case "month":
-                cycle = DateUtils.date2monthstring(new Date());
-            case "year":
-                cycle = DateUtils.date2yearstring(new Date());
-        }
+        String cycle = getCycle(count_type);
         SearchRequest request = new SearchRequest(getIndicesCI().getName());
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.query(QueryBuilders.termQuery("count_type", count_type));
@@ -260,5 +249,18 @@ public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> impleme
         }
         LOGGER.info("Indices Paging Search end!");
         return new PageData(condt.getPageIndex(), condt.getPageSize(), total, response.getHits().getHits());
+    }
+
+    protected String getCycle(String count_type) {
+        String cycle = "";
+        switch (count_type) {
+            case "day":
+                cycle = DateUtils.date2string(DateUtils.getYestoday());
+            case "month":
+                cycle = DateUtils.date2monthstring(new Date());
+            case "year":
+                cycle = DateUtils.date2yearstring(new Date());
+        }
+        return cycle;
     }
 }

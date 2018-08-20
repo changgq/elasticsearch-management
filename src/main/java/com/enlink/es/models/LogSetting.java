@@ -1,7 +1,6 @@
 package com.enlink.es.models;
 
 import com.enlink.es.utils.DateUtils;
-import com.sun.org.apache.xerces.internal.xs.StringList;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
