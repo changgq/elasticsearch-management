@@ -84,7 +84,7 @@ public class IndicesCreateInfo {
             return this;
         }
 
-        public IndicesCIBuilder setSettings(List<Alias> aliases) {
+        public IndicesCIBuilder setAliases(List<Alias> aliases) {
             this.aliases = aliases;
             return this;
         }

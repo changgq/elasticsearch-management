@@ -1,6 +1,6 @@
 package com.enlink.es.controllers;
 
-import com.enlink.es.controllers.base.BaseAction;
+import com.enlink.es.base.BaseAction;
 import com.enlink.es.controllers.responses.AjaxResults;
 import com.enlink.es.controllers.responses.ResultCode;
 import com.enlink.es.controllers.responses.Results;

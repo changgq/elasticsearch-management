@@ -1,6 +1,7 @@
 package com.enlink.es.models;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
@@ -10,19 +11,23 @@ import java.util.Date;
  */
 @Data
 @NoArgsConstructor
-public class ResourcesAccessCount {
-    // 主键Id
+@EqualsAndHashCode(callSuper = false)
+public class ResourcesAccessCount extends GeneralModel {
+    // 主键id = md5(cycle + username + userGroup + fullName)
     private String id;
-    // 统计时间
-    private Date timestamp;
-    private String type;
-    private String freq;
-    // 域名
-    private String domainName;
-    // 访问量
-    private String accessCount;
-    // 资源名称
-    private String resourceName;
+    // 统计类型：最近（day）、本月（month）、本年（year）
+    private String count_type;
+    // 根据统计类型，分别记录不同的内容，例如：
+    // if (countType == "day") cycle = "2018-08-20";
+    // if (countType == "month") cycle = "2018-08";
+    // if (countType == "year") cycle = "2018";
+    private String cycle;
+    // 用户名
+    private String resource_name;
+    // 用户组
+    private String domain_name;
+    // 访问次数
+    private long access_count;
     // 创建时间
-    private Date createAt;
+    private Date create_at;
 }

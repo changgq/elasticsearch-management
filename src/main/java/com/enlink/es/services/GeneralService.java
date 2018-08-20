@@ -3,11 +3,16 @@ package com.enlink.es.services;
 import com.enlink.es.base.Condt;
 import com.enlink.es.base.PageData;
 import com.enlink.es.models.GeneralModel;
+import com.enlink.es.models.UserLoginCount;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
+import org.elasticsearch.search.SearchHit;
+
+import java.util.List;
+import java.util.Map;
 
 /**
- * 通用业务接口
+ * Index操作相关通用业务接口
  *
  * @param <T>
  * @author changgq
@@ -39,6 +44,41 @@ public interface GeneralService<T extends GeneralModel> {
     boolean putMappings() throws Exception;
 
     /**
+     * 保存或更新索引记录
+     *
+     * @param id
+     * @param sources
+     * @throws Exception
+     */
+    void saveOrUpdate(String id, String sources) throws Exception;
+
+    /**
+     * 根据id删除索引记录
+     *
+     * @param id
+     * @throws Exception
+     */
+    void delete(String id) throws Exception;
+
+    /**
+     * 根据id查询索引记录
+     *
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    Map<String, Object> findById(String id) throws Exception;
+
+    /**
+     * 根据索引判断索引是否存在
+     *
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    boolean documentIsExists(String id) throws Exception;
+
+    /**
      * 条件分页查询
      *
      * @param condt
@@ -47,7 +87,18 @@ public interface GeneralService<T extends GeneralModel> {
      * @return
      * @throws Exception
      */
-    PageData<T> findByPaging(Condt condt, Integer pageIndex, Integer pageSize) throws Exception;
+    PageData findByPaging(Condt condt, Integer pageIndex, Integer pageSize) throws Exception;
+
+    /**
+     * 按周期类型查询用户访问数据top排行
+     *
+     * @param cls
+     * @param count_type
+     * @param top
+     * @return
+     * @throws Exception
+     */
+    List<T> findByCycleType(Class<T> cls, Map<String, Object> conditions, String count_type, int top) throws Exception;
 
     /**
      * 索引创建成功默认回调函数

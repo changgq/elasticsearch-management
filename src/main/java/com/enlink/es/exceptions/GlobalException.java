@@ -19,10 +19,10 @@ import javax.servlet.http.HttpServletRequest;
 public class GlobalException {
 
     @ResponseBody
-    @ExceptionHandler
+    @ExceptionHandler({ Exception.class })
     public AjaxResults handler(HttpServletRequest request, Exception e) {
-        LOGGER.error(e.getMessage());
         e.printStackTrace();
+        LOGGER.error(e.getMessage());
         return Results.errorOf(ResultCode.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 }

@@ -23,36 +23,39 @@ apply plugin: 'org.springframework.boot'
 group 'com.enlink'
 version '1.0-SNAPSHOT'
 
-jar {
+bootJar {
     baseName = 'ES'
     version = '1.0-SNAPSHOT'
 }
 
 repositories {
+    maven { url "https://artifacts.elastic.co/maven/" }
     maven { url "http://repo.spring.io/plugins-release/" }
     mavenCentral()
 }
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$vKotlin"
-    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.16'
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.16"
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:$vJacksonKotlin"
     compile "org.springframework.boot:spring-boot-starter-web:$vSpringBoot"
-    // 用户登录认证
+
     compile "org.springframework.boot:spring-boot-devtools:$vSpringBoot"
     compile "org.springframework.boot:spring-boot-configuration-processor:$vSpringBoot"
     compile "org.springframework.boot:spring-boot-starter-actuator:$vSpringBoot"
 
-    compile 'io.dropwizard.metrics:metrics-core:4.0.2'
+    compile "io.dropwizard.metrics:metrics-core:4.0.2"
     compile "com.squareup.okhttp3:okhttp:3.10.0"
     compile "org.apache.poi:poi:$vPoi"
     compile "org.apache.poi:poi-ooxml:$vPoi"
     compile "org.elasticsearch.client:elasticsearch-rest-high-level-client:$vElasticsearch"
     compile "org.elasticsearch:elasticsearch:$vElasticsearch"
+    compile "org.elasticsearch.plugin:jdbc:$vElasticsearch"
+
     compile "com.google.code.gson:gson:$vGson"
-    compile 'com.google.guava:guava:25.1-jre'
-    compile 'com.alibaba:fastjson:1.2.47'
-    compile 'org.projectlombok:lombok:1.18.2'
+    compile "com.google.guava:guava:25.1-jre"
+    compile "com.alibaba:fastjson:1.2.47"
+    compile "org.projectlombok:lombok:1.18.2"
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }

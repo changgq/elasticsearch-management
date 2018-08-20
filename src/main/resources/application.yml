@@ -4,7 +4,7 @@ server:
     path: /es-management
 
 elasticsearch:
-  host: 49.4.9.225:9200
+  host: http://49.4.9.225:9200
   index:
     user: user-filebeat
     resources: res-filebeat
@@ -13,3 +13,4 @@ elasticsearch:
     userAccess: user-access-count
     userLogin: user-login-count
     resourceAccess: res-access-count
+    logSetting: .log-setting

@@ -1,11 +1,13 @@
 package com.enlink.es.models;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
 @Data
-public class UserLogModel {
+@EqualsAndHashCode(callSuper = false)
+public class UserLog extends GeneralModel {
     // 日志级别
     private String logLevel;
     // 日志时间

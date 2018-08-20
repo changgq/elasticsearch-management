@@ -2,11 +2,11 @@ package com.enlink.es.services.impl;
 
 import com.enlink.es.base.IndicesCreateInfo;
 import com.enlink.es.models.UserAccessCount;
+import com.enlink.es.models.UserLoginCount;
 import com.enlink.es.services.UserAccessCountService;
+import com.enlink.es.services.UserLoginCountService;
 import com.enlink.es.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -29,10 +29,10 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class UserAccessCountServiceImpl extends GeneralAbstractServiceImpl<UserAccessCount> implements UserAccessCountService {
+public class UserLoginCountServiceImpl extends GeneralAbstractServiceImpl<UserLoginCount> implements UserLoginCountService {
 
-    @Value("${elasticsearch.index.userAccess}")
-    private String userAccessIndex;
+    @Value("${elasticsearch.index.userLogin}")
+    private String userLoginIndex;
 
     @Autowired
     private RestHighLevelClient elasticsearch;
@@ -44,7 +44,7 @@ public class UserAccessCountServiceImpl extends GeneralAbstractServiceImpl<UserA
 
     @Override
     public IndicesCreateInfo getIndicesCI() throws Exception {
-        return new IndicesCreateInfo.IndicesCIBuilder(userAccessIndex)
+        return new IndicesCreateInfo.IndicesCIBuilder(userLoginIndex)
                 .setNumberOfShards(1)
                 .setNumberOfReplicas(0)
                 .setMappings("{\n" +
