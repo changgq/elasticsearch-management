@@ -32,8 +32,6 @@ public class AppLibraryServiceImpl extends GeneralAbstractServiceImpl<AppLibrary
     @Override
     public IndicesCreateInfo getIndicesCI() throws Exception {
         return new IndicesCreateInfo.IndicesCIBuilder(appLibraryIndex)
-                .setNumberOfShards(1)
-                .setNumberOfReplicas(0)
                 .setMappings("{\n" +
                         "  \"doc\": {\n" +
                         "    \"properties\": {\n" +

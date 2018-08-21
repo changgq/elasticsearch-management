@@ -27,6 +27,4 @@ public class UserLoginCount extends GeneralModel {
     private String full_name;
     // 访问次数
     private long access_count;
-    // 创建时间
-    private Date create_at;
 }

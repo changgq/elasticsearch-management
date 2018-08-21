@@ -30,6 +30,48 @@ public class AdminLogServiceImpl extends GeneralAbstractServiceImpl<AdminLog> im
 
     @Override
     public IndicesCreateInfo getIndicesCI() throws Exception {
-        return new IndicesCreateInfo.IndicesCIBuilder(adminLogIndex).create();
+        return new IndicesCreateInfo.IndicesCIBuilder(adminLogIndex)
+                .setMappings("{\n" +
+                        "  \"doc\": {\n" +
+                        "    \"properties\": {\n" +
+                        "      \"log_level\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"log_time\": {\n" +
+                        "        \"type\": \"date\",\n" +
+                        "        \"format\": \"yyyy-MM-dd HH:mm:ss\"\n" +
+                        "      },\n" +
+                        "      \"operation_method\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"full_name\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"user_name\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"role_name\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"right_name\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"remote_ip\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"mac_address\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"log_info\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"create_at\": {\n" +
+                        "        \"type\": \"date\",\n" +
+                        "        \"format\": \"yyyy-MM-dd HH:mm:ss\"\n" +
+                        "      }\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .create();
     }
 }

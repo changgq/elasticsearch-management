@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 /**
  * 资源日志
  *
@@ -31,7 +33,7 @@ public class ResourceLog extends GeneralModel {
     // 2**、3**、4**、5**
     private String keyword_status;
     // 日志时间
-    private String log_time;
+    private Date log_time;
     // 响应时间
     private float response_time;
     // 资源名称
@@ -45,7 +47,7 @@ public class ResourceLog extends GeneralModel {
     // 总流量
     private long total_flow;
     // User-Agent：用户请求的代理软件，包括用户的操作系统，浏览器等相关属性。
-    private String user_agent;
+    private String user_agent_string;
     // 请求报头；请求首部
     private String request_referer;
     // 最小请求次数?

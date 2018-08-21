@@ -45,8 +45,6 @@ public class UserAccessCountServiceImpl extends GeneralAbstractServiceImpl<UserA
     @Override
     public IndicesCreateInfo getIndicesCI() throws Exception {
         return new IndicesCreateInfo.IndicesCIBuilder(userAccessIndex)
-                .setNumberOfShards(1)
-                .setNumberOfReplicas(0)
                 .setMappings("{\n" +
                         "  \"doc\": {\n" +
                         "    \"properties\": {\n" +

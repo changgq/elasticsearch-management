@@ -1,9 +1,9 @@
 package com.enlink.es.services;
 
 import com.enlink.es.models.UserLog;
+import com.enlink.es.models.UserLoginCount;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 用户日志业务层接口
@@ -19,5 +19,5 @@ public interface UserLogService extends GeneralService<UserLog> {
      * @return
      * @throws Exception
      */
-    List<Map<String, Object>> getUserLoginCount(String type) throws Exception;
+    List<UserLoginCount> getUserLoginCount(String type) throws Exception;
 }

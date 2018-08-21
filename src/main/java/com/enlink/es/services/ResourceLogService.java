@@ -1,6 +1,8 @@
 package com.enlink.es.services;
 
 import com.enlink.es.models.ResourceLog;
+import com.enlink.es.models.ResourcesAccessCount;
+import com.enlink.es.models.UserAccessCount;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +21,7 @@ public interface ResourceLogService extends GeneralService<ResourceLog> {
      * @return
      * @throws Exception
      */
-    List<Map<String, Object>> findResourceAccessCount(String type) throws Exception;
+    List<ResourcesAccessCount> findResourceAccessCount(String type) throws Exception;
 
     /**
      * 根据类型获取用户访问数量统计
@@ -28,5 +30,5 @@ public interface ResourceLogService extends GeneralService<ResourceLog> {
      * @return
      * @throws Exception
      */
-    List<Map<String, Object>> findUserAccessCount(String type) throws Exception;
+    List<UserAccessCount> findUserAccessCount(String type) throws Exception;
 }

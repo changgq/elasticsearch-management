@@ -1,10 +1,17 @@
 package com.enlink.es.models;
 
+import lombok.Data;
+
 import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+@Data
 public class GeneralModel {
+
+    // 创建时间
+    private Date create_at;
 
     /**
      * 通过反射将java对象转化为map

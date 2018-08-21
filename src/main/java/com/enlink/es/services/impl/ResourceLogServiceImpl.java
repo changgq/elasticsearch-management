@@ -2,13 +2,20 @@ package com.enlink.es.services.impl;
 
 import com.enlink.es.base.IndicesCreateInfo;
 import com.enlink.es.models.ResourceLog;
+import com.enlink.es.models.ResourcesAccessCount;
+import com.enlink.es.models.UserAccessCount;
+import com.enlink.es.models.UserLoginCount;
 import com.enlink.es.services.ResourceLogService;
+import com.google.common.hash.Hashing;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -34,16 +41,127 @@ public class ResourceLogServiceImpl extends GeneralAbstractServiceImpl<ResourceL
 
     @Override
     public IndicesCreateInfo getIndicesCI() throws Exception {
-        return new IndicesCreateInfo.IndicesCIBuilder(resourceLogIndex).create();
+        return new IndicesCreateInfo.IndicesCIBuilder(resourceLogIndex)
+                .setMappings("{\n" +
+                        "  \"doc\": {\n" +
+                        "    \"properties\": {\n" +
+                        "      \"log_level\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"session_id\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"full_name\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"user_name\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"user_group\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"remote_ip\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"keyword_status\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"log_time\": {\n" +
+                        "        \"type\": \"date\",\n" +
+                        "        \"format\": \"yyyy-MM-dd HH:mm:ss\"\n" +
+                        "      },\n" +
+                        "      \"response_time\": {\n" +
+                        "        \"type\": \"float\"\n" +
+                        "      },\n" +
+                        "      \"resource_name\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"uri\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"upward_flow\": {\n" +
+                        "        \"type\": \"long\"\n" +
+                        "      },\n" +
+                        "      \"downward_flow\": {\n" +
+                        "        \"type\": \"long\"\n" +
+                        "      },\n" +
+                        "      \"total_flow\": {\n" +
+                        "        \"type\": \"long\"\n" +
+                        "      },\n" +
+                        "      \"user_agent_string\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"request_referer\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"request_count\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"http_protocol\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"content_type\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"app_type\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"create_at\": {\n" +
+                        "        \"type\": \"date\",\n" +
+                        "        \"format\": \"yyyy-MM-dd HH:mm:ss\"\n" +
+                        "      }\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .create();
     }
 
     @Override
-    public List<Map<String, Object>> findResourceAccessCount(String type) throws Exception {
-        return docCountByTimestamp(type, "doc['resource_name'].value");
+    public List<ResourcesAccessCount> findResourceAccessCount(String type) throws Exception {
+//        return docCountByTimestamp(type, "doc['resource_name'].value");
+        CyclePojo cyclePojo = docCountByTimestamp(type, "doc['resource_name'].value");
+        List<ResourcesAccessCount> raCounts = new ArrayList<>();
+        if (null != cyclePojo && null != cyclePojo.getDatas()) {
+            for (String k : cyclePojo.getDatas().keySet()) {
+                if (Strings.isNotBlank(k)) {
+                    ResourcesAccessCount racount = new ResourcesAccessCount();
+                    racount.setId(Hashing.md5().hashBytes((cyclePojo.getName() + cyclePojo.getValue() + k).getBytes()).toString());
+                    racount.setCount_type(cyclePojo.getName());
+                    racount.setCycle(cyclePojo.getValue());
+                    String[] keys = k.split("|");
+                    racount.setResource_name(k);
+                    // 获取配置的应用库名称
+                    racount.setDomain_name("");
+                    racount.setAccess_count((long) cyclePojo.getDatas().get(k));
+                    racount.setCreate_at(new Date());
+                    raCounts.add(racount);
+                }
+            }
+        }
+        return raCounts;
     }
 
     @Override
-    public List<Map<String, Object>> findUserAccessCount(String type) throws Exception {
-        return docCountByTimestamp(type, "doc['user_id'].value + '|' + doc['user_name'].value + '|' + doc['user_group'].value");
+    public List<UserAccessCount> findUserAccessCount(String type) throws Exception {
+        CyclePojo cyclePojo = docCountByTimestamp(type, "doc['full_name'].value + '|' + doc['user_name'].value + '|' + doc['user_group'].value");
+        List<UserAccessCount> uaCounts = new ArrayList<>();
+        if (null != cyclePojo && null != cyclePojo.getDatas()) {
+            for (String k : cyclePojo.getDatas().keySet()) {
+                if (Strings.isNotBlank(k) && !k.replaceAll("|", "").equals("")) {
+                    UserAccessCount uacount = new UserAccessCount();
+                    uacount.setId(Hashing.md5().hashBytes((cyclePojo.getName() + cyclePojo.getValue() + k).getBytes()).toString());
+                    uacount.setCount_type(cyclePojo.getName());
+                    uacount.setCycle(cyclePojo.getValue());
+                    String[] keys = k.split("|");
+                    uacount.setFull_name(keys[0]);
+                    uacount.setUsername(keys[1]);
+                    uacount.setUser_group(keys[2]);
+                    uacount.setAccess_count((long) cyclePojo.getDatas().get(k));
+                    uacount.setCreate_at(new Date());
+                    uaCounts.add(uacount);
+                }
+            }
+        }
+        return uaCounts;
     }
 }

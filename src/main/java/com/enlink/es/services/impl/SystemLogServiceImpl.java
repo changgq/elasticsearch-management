@@ -31,6 +31,30 @@ public class SystemLogServiceImpl extends GeneralAbstractServiceImpl<SystemLog> 
 
     @Override
     public IndicesCreateInfo getIndicesCI() throws Exception {
-        return new IndicesCreateInfo.IndicesCIBuilder(systemLogIndex).create();
+        return new IndicesCreateInfo.IndicesCIBuilder(systemLogIndex)
+                .setMappings("{\n" +
+                        "  \"doc\": {\n" +
+                        "    \"properties\": {\n" +
+                        "      \"log_level\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"log_time\": {\n" +
+                        "        \"type\": \"date\",\n" +
+                        "        \"format\": \"yyyy-MM-dd HH:mm:ss\"\n" +
+                        "      },\n" +
+                        "      \"type\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"log_info\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"create_at\": {\n" +
+                        "        \"type\": \"date\",\n" +
+                        "        \"format\": \"yyyy-MM-dd HH:mm:ss\"\n" +
+                        "      }\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}")
+                .create();
     }
 }

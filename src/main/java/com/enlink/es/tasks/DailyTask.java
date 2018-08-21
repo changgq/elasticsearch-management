@@ -1,14 +1,18 @@
 package com.enlink.es.tasks;
 
 
-import com.enlink.es.services.ResourcesAccessCountService;
-import com.enlink.es.services.UserAccessCountService;
-import com.enlink.es.services.UserLoginCountService;
+import com.enlink.es.models.UserLoginCount;
+import com.enlink.es.services.*;
+import com.enlink.es.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 每日凌晨（0点）执行定时任务
@@ -18,6 +22,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class DailyTask {
+
+    @Autowired
+    private UserLogService userLogService;
+
+    @Autowired
+    private ResourceLogService resourceLogService;
 
     @Autowired
     private UserLoginCountService userLoginCountService;
@@ -31,11 +41,11 @@ public class DailyTask {
     @Async
     @Scheduled(cron = "0 0 0 * * ?") // 凌晨1点：0 0 1 * * ?
     public void run() {
-
+        LOGGER.info(DateUtils.datetime2string(new Date()) + " : Daily count task start......");
         userLoginDaily();
         userAccessDaily();
         resourcesAccessDaily();
-
+        LOGGER.info(DateUtils.datetime2string(new Date()) + " : Daily count task end !");
     }
 
 
@@ -43,11 +53,25 @@ public class DailyTask {
      * 按天统计用户登录次数
      */
     private void userLoginDaily() {
-        // 获取最近一天的日志登录数统计情况
+        try {
+            // 获取最近一天的日志登录数统计情况
+            List<UserLoginCount> dailyUserLoginCount = userLogService.getUserLoginCount("day");
+            for (UserLoginCount m : dailyUserLoginCount) {
 
-        // 获取最近一月的日志登录数统计情况
+            }
+            // 获取最近一月的日志登录数统计情况
+            List<UserLoginCount> monthUserLoginCount = userLogService.getUserLoginCount("month");
+            for (UserLoginCount m : monthUserLoginCount) {
 
-        // 获取最近一年的日志登录数统计情况
+            }
+            // 获取最近一年的日志登录数统计情况
+            List<UserLoginCount> yearUserLoginCount = userLogService.getUserLoginCount("year");
+            for (UserLoginCount m : yearUserLoginCount) {
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

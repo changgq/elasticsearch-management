@@ -28,6 +28,4 @@ public class ResourcesAccessCount extends GeneralModel {
     private String domain_name;
     // 访问次数
     private long access_count;
-    // 创建时间
-    private Date create_at;
 }

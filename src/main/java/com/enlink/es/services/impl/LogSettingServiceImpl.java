@@ -27,8 +27,6 @@ public class LogSettingServiceImpl extends GeneralAbstractServiceImpl<LogSetting
     @Override
     public IndicesCreateInfo getIndicesCI() throws Exception {
         return new IndicesCreateInfo.IndicesCIBuilder(logSettingIndex)
-                .setNumberOfShards(1)
-                .setNumberOfReplicas(0)
                 .setMappings("{\n" +
                         "  \"doc\": {\n" +
                         "    \"properties\": {\n" +
@@ -67,6 +65,10 @@ public class LogSettingServiceImpl extends GeneralAbstractServiceImpl<LogSetting
                         "      },\n" +
                         "      \"log_levels\": {\n" +
                         "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"create_at\": {\n" +
+                        "        \"type\": \"date\",\n" +
+                        "        \"format\": \"yyyy-MM-dd HH:mm:ss\"\n" +
                         "      }\n" +
                         "    }\n" +
                         "  }\n" +

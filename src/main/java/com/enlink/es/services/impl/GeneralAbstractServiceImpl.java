@@ -6,11 +6,10 @@ import com.enlink.es.base.PageData;
 import com.enlink.es.models.GeneralModel;
 import com.enlink.es.services.GeneralService;
 import com.enlink.es.utils.DateUtils;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
-import org.apache.poi.ss.usermodel.DateUtil;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -254,7 +253,14 @@ public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> impleme
             total = totalHits;
         }
         LOGGER.info("Indices Paging Search end!");
-        return new PageData(condt.getPageIndex(), condt.getPageSize(), total, response.getHits().getHits());
+
+        PageData pageData = new PageData();
+        pageData.setPageIndex(condt.getPageIndex());
+        pageData.setPageSize(condt.getPageSize());
+        pageData.setTotal(total);
+        pageData.setData(response.getHits().getHits());
+
+        return pageData;
     }
 
 
@@ -266,7 +272,7 @@ public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> impleme
      * @return
      * @throws Exception
      */
-    protected List<Map<String, Object>> docCountByTimestamp(String type, String scripts) throws Exception {
+    protected CyclePojo docCountByTimestamp(String type, String scripts) throws Exception {
         List<Map<String, Object>> datas = new ArrayList<>();
         CyclePojo cycle = getCycle(type);
 
@@ -290,13 +296,13 @@ public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> impleme
         SearchResponse response = getClient().search(request);
         Terms terms = response.getAggregations().get("distinct");
 
+        Map<String, Object> map = new HashMap<>();
         for (Terms.Bucket bucket : terms.getBuckets()) {
-            Map<String, Object> map = new HashMap<>();
             map.put(bucket.getKeyAsString(), bucket.getDocCount());
-            datas.add(map);
         }
 
-        return datas;
+        cycle.setDatas(map);
+        return cycle;
     }
 
     /**
@@ -307,11 +313,9 @@ public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> impleme
      */
     protected CyclePojo getCycle(String count_type) {
         Date yesterday = DateUtils.getYesterday();
-        CyclePojo cyclePojo = new CyclePojo(count_type,
-                DateUtils.date2string(yesterday),
-                "yyyy-MM-dd",
-                DateUtils.date2string(yesterday),
-                DateUtils.date2string(yesterday));
+        CyclePojo cyclePojo = new CyclePojo();
+        cyclePojo.setName(count_type);
+        cyclePojo.setPattern("yyyy-MM-dd");
         if ("month".equals(count_type)) {
             cyclePojo.setValue(DateUtils.date2monthstring(yesterday));
             cyclePojo.setFrom(DateUtils.date2string(DateUtils.firstDayOfMonth(yesterday)));
@@ -329,12 +333,13 @@ public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> impleme
     }
 
     @Data
-    @AllArgsConstructor
+    @NoArgsConstructor
     class CyclePojo {
         private String name;
         private String value;
         private String pattern;
         private String from;
         private String to;
+        private Map<String, Object> datas;
     }
 }

@@ -45,8 +45,6 @@ public class UserLoginCountServiceImpl extends GeneralAbstractServiceImpl<UserLo
     @Override
     public IndicesCreateInfo getIndicesCI() throws Exception {
         return new IndicesCreateInfo.IndicesCIBuilder(userLoginIndex)
-                .setNumberOfShards(1)
-                .setNumberOfReplicas(0)
                 .setMappings("{\n" +
                         "  \"doc\": {\n" +
                         "    \"properties\": {\n" +

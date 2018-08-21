@@ -45,8 +45,6 @@ public class ResourcesAccessCountServiceImpl extends GeneralAbstractServiceImpl<
     @Override
     public IndicesCreateInfo getIndicesCI() throws Exception {
         return new IndicesCreateInfo.IndicesCIBuilder(resourceAccessIndex)
-                .setNumberOfShards(1)
-                .setNumberOfReplicas(0)
                 .setMappings("{\n" +
                         "  \"doc\": {\n" +
                         "    \"properties\": {\n" +

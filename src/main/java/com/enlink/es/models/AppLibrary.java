@@ -18,5 +18,4 @@ public class AppLibrary extends GeneralModel {
     private String app_name;
     private String description;
     private List<String> app_urls;
-    private Date create_at;
 }
