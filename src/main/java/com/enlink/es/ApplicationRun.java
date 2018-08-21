@@ -2,8 +2,15 @@ package com.enlink.es;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.logging.log4j.util.Strings;
 import org.elasticsearch.action.main.MainResponse;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.xpack.sql.jdbc.jdbcx.JdbcDataSource;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +37,13 @@ import static org.hibernate.validator.internal.util.Contracts.assertTrue;
 public class ApplicationRun {
 
     @Value("${elasticsearch.host}")
-    private String elasticsearchConn;
+    private String host;
+
+    @Value("${elasticsearch.username}")
+    private String username;
+
+    @Value("${elasticsearch.password}")
+    private String password;
 
     /**
      * 加载Elasticsearch客户端到容器
@@ -40,7 +53,17 @@ public class ApplicationRun {
     @Bean
     public RestHighLevelClient elasticsearch() {
         LOGGER.info("init elasticsearch client start ......");
-        RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(HttpHost.create(elasticsearchConn)));
+        RestClientBuilder builder = RestClient.builder(HttpHost.create(host));
+        // 校验 username 和 password
+        if (Strings.isNotBlank(username) && Strings.isNotBlank(password)) {
+            final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+            builder.setHttpClientConfigCallback(httpClientBuilder -> {
+                httpClientBuilder.disableAuthCaching();
+                return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+            });
+        }
+        RestHighLevelClient client = new RestHighLevelClient(builder);
         LOGGER.info("init elasticsearch client success !");
         return client;
     }

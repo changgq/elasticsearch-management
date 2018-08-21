@@ -1,10 +1,7 @@
 package com.enlink.es.config;
 
 import com.enlink.es.models.LogSetting;
-import com.enlink.es.services.LogSettingService;
-import com.enlink.es.services.ResourcesAccessCountService;
-import com.enlink.es.services.UserAccessCountService;
-import com.enlink.es.services.UserLoginCountService;
+import com.enlink.es.services.*;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,6 +27,16 @@ public class StartInitRunner implements CommandLineRunner {
     private ResourcesAccessCountService resourcesAccessCountService;
     @Autowired
     private LogSettingService logSettingService;
+    @Autowired
+    private AppLibraryService appLibraryService;
+    @Autowired
+    private UserLogService userLogService;
+    @Autowired
+    private ResourceLogService resourceLogService;
+    @Autowired
+    private AdminLogService adminLogService;
+    @Autowired
+    private SystemLogService systemLogService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -46,12 +54,10 @@ public class StartInitRunner implements CommandLineRunner {
         resourcesAccessCountService.createIndex();
         LOGGER.info("init Index{name = \"resource-access-count\"} success!");
 
-        // 下载文件生成记录
-        LOGGER.info("init Index{name = \"resource-access-count\"} start ......");
-        resourcesAccessCountService.createIndex();
-        LOGGER.info("init Index{name = \"resource-access-count\"} success!");
+        LOGGER.info("init Index{name = \".app-library\"} start ......");
+        appLibraryService.createIndex();
+        LOGGER.info("init Index{name = \".app-library\"} success!");
 
-        // 日志设置信息
         LOGGER.info("init Index{name = \".log-setting\"} start ......");
         logSettingService.createIndex();
         boolean documentIsExists = logSettingService.documentIsExists("1");
@@ -60,20 +66,24 @@ public class StartInitRunner implements CommandLineRunner {
         }
         LOGGER.info("init Index{name = \".log-setting\"} success!");
 
+        LOGGER.info("init Index{name = \"resource-access-count\"} start ......");
+        resourcesAccessCountService.createIndex();
+        LOGGER.info("init Index{name = \"resource-access-count\"} success!");
+
         LOGGER.info("init Index{name = \"user-filebeat\"} start ......");
-//        userLoginCountService.createIndex();
+        userLogService.createIndex();
         LOGGER.info("init Index{name = \"user-filebeat\"} success!");
 
         LOGGER.info("init Index{name = \"res-filebeat\"} start ......");
-//        userLoginCountService.createIndex();
+        resourceLogService.createIndex();
         LOGGER.info("init Index{name = \"res-filebeat\"} success!");
 
         LOGGER.info("init Index{name = \"system-filebeat\"} start ......");
-//        userLoginCountService.createIndex();
+        systemLogService.createIndex();
         LOGGER.info("init Index{name = \"system-filebeat\"} success!");
 
         LOGGER.info("init Index{name = \"admin-filebeat\"} start ......");
-//        userLoginCountService.createIndex();
+        adminLogService.createIndex();
         LOGGER.info("init Index{name = \"admin-filebeat\"} success!");
 
         LOGGER.info("init index success!");

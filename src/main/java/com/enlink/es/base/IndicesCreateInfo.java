@@ -40,7 +40,7 @@ public class IndicesCreateInfo {
         private final String name;
         private String type = "doc";
         private int number_of_shards = 1;
-        private int number_of_replicas = 0;
+        private int number_of_replicas = 1;
         private String settings;
         private String mappings;
         private String source;

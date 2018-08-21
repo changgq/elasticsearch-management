@@ -6,8 +6,11 @@ import com.enlink.es.base.PageData;
 import com.enlink.es.models.GeneralModel;
 import com.enlink.es.services.GeneralService;
 import com.enlink.es.utils.DateUtils;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -29,7 +32,10 @@ import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.script.Script;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
@@ -178,11 +184,11 @@ public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> impleme
 
     @Override
     public List<T> findByCycleType(Class<T> cls, Map<String, Object> conditions, String count_type, int top) throws Exception {
-        String cycle = getCycle(count_type);
+        CyclePojo cycle = getCycle(count_type);
         SearchRequest request = new SearchRequest(getIndicesCI().getName());
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        sourceBuilder.query(QueryBuilders.termQuery("count_type", count_type));
-        sourceBuilder.query(QueryBuilders.termQuery("cycle", cycle));
+        sourceBuilder.query(QueryBuilders.termQuery("count_type", cycle.getName()));
+        sourceBuilder.query(QueryBuilders.termQuery("cycle", cycle.getValue()));
         if (null != conditions) {
             for (String conditionKey : conditions.keySet()) {
                 sourceBuilder.query(QueryBuilders.termsQuery(conditionKey, conditions.get(conditionKey)));
@@ -251,16 +257,84 @@ public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> impleme
         return new PageData(condt.getPageIndex(), condt.getPageSize(), total, response.getHits().getHits());
     }
 
-    protected String getCycle(String count_type) {
-        String cycle = "";
-        switch (count_type) {
-            case "day":
-                cycle = DateUtils.date2string(DateUtils.getYestoday());
-            case "month":
-                cycle = DateUtils.date2monthstring(new Date());
-            case "year":
-                cycle = DateUtils.date2yearstring(new Date());
+
+    /**
+     * 根据timestamp和script按年、月、日（默认：昨日）统计doc数量
+     *
+     * @param type
+     * @param scripts
+     * @return
+     * @throws Exception
+     */
+    protected List<Map<String, Object>> docCountByTimestamp(String type, String scripts) throws Exception {
+        List<Map<String, Object>> datas = new ArrayList<>();
+        CyclePojo cycle = getCycle(type);
+
+        SearchRequest request = new SearchRequest().indices(getIndicesCI().getName());
+
+        SearchSourceBuilder sourceBuiilder = new SearchSourceBuilder().fetchSource(false);
+        sourceBuiilder.query(
+                QueryBuilders.rangeQuery("@timestamp")
+                        .format(cycle.getPattern())
+                        .from(cycle.getFrom())
+                        .to(cycle.getTo()));
+
+        sourceBuiilder.aggregation(
+                AggregationBuilders.terms("distinct")
+                        .size(Integer.MAX_VALUE)
+                        .script(new Script(scripts)));
+        request.source(sourceBuiilder);
+
+        LOGGER.info("Elasticsearch search query string : " + request.source().toString());
+
+        SearchResponse response = getClient().search(request);
+        Terms terms = response.getAggregations().get("distinct");
+
+        for (Terms.Bucket bucket : terms.getBuckets()) {
+            Map<String, Object> map = new HashMap<>();
+            map.put(bucket.getKeyAsString(), bucket.getDocCount());
+            datas.add(map);
         }
-        return cycle;
+
+        return datas;
+    }
+
+    /**
+     * 根据类型获取周期对象
+     *
+     * @param count_type
+     * @return
+     */
+    protected CyclePojo getCycle(String count_type) {
+        Date yesterday = DateUtils.getYesterday();
+        CyclePojo cyclePojo = new CyclePojo(count_type,
+                DateUtils.date2string(yesterday),
+                "yyyy-MM-dd",
+                DateUtils.date2string(yesterday),
+                DateUtils.date2string(yesterday));
+        if ("month".equals(count_type)) {
+            cyclePojo.setValue(DateUtils.date2monthstring(yesterday));
+            cyclePojo.setFrom(DateUtils.date2string(DateUtils.firstDayOfMonth(yesterday)));
+            cyclePojo.setTo(DateUtils.date2string(DateUtils.lastDayOfMonth(yesterday)));
+        } else if ("year".equals(count_type)) {
+            cyclePojo.setValue(DateUtils.date2yearstring(yesterday));
+            cyclePojo.setFrom(DateUtils.date2string(DateUtils.firstDayOfYear(yesterday)));
+            cyclePojo.setTo(DateUtils.date2string(DateUtils.lastDayOfYear(yesterday)));
+        } else {
+            cyclePojo.setValue(DateUtils.date2string(yesterday));
+            cyclePojo.setFrom(DateUtils.date2string(yesterday));
+            cyclePojo.setTo(DateUtils.date2string(yesterday));
+        }
+        return cyclePojo;
+    }
+
+    @Data
+    @AllArgsConstructor
+    class CyclePojo {
+        private String name;
+        private String value;
+        private String pattern;
+        private String from;
+        private String to;
     }
 }

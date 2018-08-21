@@ -18,7 +18,7 @@ public class DateUtils {
      *
      * @return
      */
-    public static Date getYestoday() {
+    public static Date getYesterday() {
         Calendar calendar = new GregorianCalendar();
         calendar.add(Calendar.DATE, -1);
         return calendar.getTime();
@@ -102,5 +102,116 @@ public class DateUtils {
      */
     public static Date string2datetime(String day) throws ParseException {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(day);
+    }
+
+    /**
+     * 本周第一天的日期
+     *
+     * @return
+     */
+    public static Date firstDayOfWeek(Date day) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(day == null ? new Date() : day);
+        cal.set(Calendar.DAY_OF_WEEK, 1);
+        return cal.getTime();
+    }
+
+    /**
+     * 本周最后一天的日期
+     *
+     * @return
+     */
+    public static Date lastDayOfWeek(Date day) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(day == null ? new Date() : day);
+        cal.set(Calendar.DAY_OF_WEEK, 1);
+        cal.roll(Calendar.DAY_OF_WEEK, -1);
+        return cal.getTime();
+    }
+
+    /**
+     * 月份第一天
+     *
+     * @return
+     */
+    public static Date firstDayOfMonth(Date day) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(day == null ? new Date() : day);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        return cal.getTime();
+    }
+
+    /**
+     * 月份最后一天
+     *
+     * @return
+     */
+    public static Date lastDayOfMonth(Date day) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(day == null ? new Date() : day);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.roll(Calendar.DAY_OF_MONTH, -1);
+        return cal.getTime();
+    }
+
+    /**
+     * 年份第一天
+     *
+     * @return
+     */
+    public static Date firstDayOfYear(Date day) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(day == null ? new Date() : day);
+        cal.set(Calendar.DAY_OF_YEAR, 1);
+        return cal.getTime();
+    }
+
+    /**
+     * 年份最后一天
+     *
+     * @return
+     */
+    public static Date lastDayOfYear(Date day) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(day == null ? new Date() : day);
+        cal.set(Calendar.DAY_OF_YEAR, 1);
+        cal.roll(Calendar.DAY_OF_YEAR, -1);
+        return cal.getTime();
+    }
+
+    /**
+     * 最近三个月的第一天
+     *
+     * @return
+     */
+    public static Date firstDayOfLast3Month() {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(new Date());
+        cal.add(Calendar.DATE, 90 * -1);
+        return cal.getTime();
+    }
+
+    /**
+     * 最近六个月的第一天
+     *
+     * @return
+     */
+    public static Date firstDayOfLast6Month() {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(new Date());
+        cal.add(Calendar.DATE, 180 * -1);
+        return cal.getTime();
+    }
+
+    /**
+     * 最近十二个月的第一天
+     *
+     * @return
+     */
+    public static Date firstDayOfLast12Month() {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(new Date());
+        cal.add(Calendar.DATE, 365 * -1);
+        return cal.getTime();
     }
 }

@@ -5,6 +5,8 @@ server:
 
 elasticsearch:
   host: http://49.4.9.225:9200
+  username:
+  password:
   index:
     user: user-filebeat
     resources: res-filebeat
@@ -14,3 +16,5 @@ elasticsearch:
     userLogin: user-login-count
     resourceAccess: res-access-count
     logSetting: .log-setting
+    appLibrary: .app-library
+
