@@ -16,5 +16,6 @@ elasticsearch:
     userLogin: user-login-count
     resourceAccess: res-access-count
     logSetting: .log-setting
+    logDownload: .log-download
     appLibrary: .app-library
 

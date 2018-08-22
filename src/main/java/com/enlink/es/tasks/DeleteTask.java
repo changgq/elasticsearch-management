@@ -20,10 +20,10 @@ public class DeleteTask {
      * 每日凌晨1点执行删除任务
      */
     @Async
-    @Scheduled(cron = "0 */2 * * * ?") // 凌晨1点：0 16 9 * * ?
+    @Scheduled(cron = "0 */2 * * * ?") // 凌晨1点：0 0 0 * * ?
     public void run() {
-        LOGGER.info(DateUtils.datetime2string(new Date()) + " : Daily delete Index task start......");
+        LOGGER.info("Daily delete Index task start......");
 
-        LOGGER.info(DateUtils.datetime2string(new Date()) + " : Daily delete Index task end !");
+        LOGGER.info("Daily delete Index task end !");
     }
 }

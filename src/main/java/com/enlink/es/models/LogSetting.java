@@ -7,6 +7,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.*;
 
+/**
+ * 日志设置
+ *
+ * @author changgq
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
@@ -33,6 +38,8 @@ public class LogSetting extends GeneralModel {
     private List<String> log_types;
     // 日志级别，默认所有
     private List<String> log_levels;
+    // 最后一次统计日期
+    private String last_count_date;
 
     /**
      * 返回初始化默认值的对象
@@ -52,6 +59,7 @@ public class LogSetting extends GeneralModel {
         logSetting.setStart_status(true);
         logSetting.setLog_types(Arrays.asList("RES", "USER", "ADMIN", "SYSTEM"));
         logSetting.setLog_levels(Arrays.asList("INFO", "WARNING", "ERROR"));
+        logSetting.setLast_count_date(DateUtils.date2string(new Date()));
         return logSetting;
     }
 }

@@ -44,11 +44,11 @@ public class DailyTask {
     @Async
     @Scheduled(cron = "0 */2 * * * ?") // 凌晨1点：0 0 0 * * ?
     public void run() {
-        LOGGER.info(DateUtils.datetime2string(new Date()) + " : Daily count task start......");
+        LOGGER.info("Daily count task start......");
         userLoginDaily();
         userAccessDaily();
         resourcesAccessDaily();
-        LOGGER.info(DateUtils.datetime2string(new Date()) + " : Daily count task end !");
+        LOGGER.info("Daily count task end !");
     }
 
 
