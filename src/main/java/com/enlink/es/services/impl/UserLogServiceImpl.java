@@ -6,6 +6,7 @@ import com.enlink.es.models.UserLog;
 import com.enlink.es.models.UserLoginCount;
 import com.enlink.es.services.UserLogService;
 import com.enlink.es.utils.DateUtils;
+import com.enlink.es.utils.SecurityUtils;
 import com.google.common.hash.Hashing;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
@@ -105,7 +106,7 @@ public class UserLogServiceImpl extends GeneralAbstractServiceImpl<UserLog> impl
                         "      },\n" +
                         "      \"create_at\": {\n" +
                         "        \"type\": \"date\",\n" +
-                        "        \"format\": \"yyyy-MM-dd HH:mm:ss\"\n" +
+                        "        \"format\": \"strict_date_optional_time||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss.SSS||dd/MMM/yyyy:HH:mm:ss Z||epoch_millis\"\n" +
                         "      }\n" +
                         "    }\n" +
                         "  }\n" +
@@ -114,26 +115,30 @@ public class UserLogServiceImpl extends GeneralAbstractServiceImpl<UserLog> impl
     }
 
     @Override
-    public List<UserLoginCount> getUserLoginCount(String type) throws Exception {
-        CyclePojo cyclePojo = docCountByTimestamp(type, "doc['full_name'].value + '|' + doc['user_name'].value + '|' + doc['user_group'].value");
+    public List<UserLoginCount> getUserLoginCount(String type, Date day) throws Exception {
+        CyclePojo cycle = getCycle(type, day);
+        CyclePojo cyclePojo = docCountByTimestamp(cycle, "doc['full_name'].value + '|' + doc['user_name'].value + '|' + doc['user_group'].value");
         List<UserLoginCount> ulCounts = new ArrayList<>();
         if (null != cyclePojo && null != cyclePojo.getDatas()) {
             for (String k : cyclePojo.getDatas().keySet()) {
-                if (Strings.isNotBlank(k) && !k.replaceAll("|", "").equals("")) {
+                if (Strings.isNotBlank(k) && !k.replaceAll("\\|", "").equals("")) {
                     UserLoginCount ulcount = new UserLoginCount();
                     ulcount.setCount_type(cyclePojo.getName());
                     ulcount.setCycle(cyclePojo.getValue());
-                    String[] keys = k.split("|");
+                    String[] keys = k.split("\\|");
                     ulcount.setFull_name(keys[0]);
                     ulcount.setUsername(keys[1]);
                     ulcount.setUser_group(keys[2]);
                     ulcount.setAccess_count((long) cyclePojo.getDatas().get(k));
-                    ulcount.setCreate_at(new Date());
-                    ulcount.setId(Hashing.md5().hashBytes((cyclePojo.getName() + cyclePojo.getValue() + k).getBytes()).toString());
+                    ulcount.setCreate_at(DateUtils.datetime2string(new Date()));
+                    ulcount.setId(SecurityUtils.md5(cyclePojo.getName() + cyclePojo.getValue() + k));
                     ulCounts.add(ulcount);
                 }
             }
         }
+        // 对象释放
+        cycle = null;
+        cyclePojo = null;
         return ulCounts;
     }
 }

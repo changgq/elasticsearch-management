@@ -46,6 +46,4 @@ public class UserLog extends GeneralModel {
     private String extend_fields_2;
     // 冗余字段三
     private String extend_fields_3;
-    // 冗余字段四
-    private String extend_fields_4;
 }

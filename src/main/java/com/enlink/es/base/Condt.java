@@ -12,7 +12,6 @@ public class Condt {
     private String cycle;
     private Map<String, Object> terms;
     private Map<String, Object> fuzziness;
-    private Map<String, Object> d;
     private int pageIndex;
     private int pageSize;
 }

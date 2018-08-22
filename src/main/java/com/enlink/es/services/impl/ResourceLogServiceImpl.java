@@ -6,6 +6,8 @@ import com.enlink.es.models.ResourcesAccessCount;
 import com.enlink.es.models.UserAccessCount;
 import com.enlink.es.models.UserLoginCount;
 import com.enlink.es.services.ResourceLogService;
+import com.enlink.es.utils.DateUtils;
+import com.enlink.es.utils.SecurityUtils;
 import com.google.common.hash.Hashing;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
@@ -108,7 +110,7 @@ public class ResourceLogServiceImpl extends GeneralAbstractServiceImpl<ResourceL
                         "      },\n" +
                         "      \"create_at\": {\n" +
                         "        \"type\": \"date\",\n" +
-                        "        \"format\": \"yyyy-MM-dd HH:mm:ss\"\n" +
+                        "        \"format\": \"strict_date_optional_time||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss.SSS||dd/MMM/yyyy:HH:mm:ss Z||epoch_millis\"\n" +
                         "      }\n" +
                         "    }\n" +
                         "  }\n" +
@@ -117,23 +119,24 @@ public class ResourceLogServiceImpl extends GeneralAbstractServiceImpl<ResourceL
     }
 
     @Override
-    public List<ResourcesAccessCount> findResourceAccessCount(String type) throws Exception {
+    public List<ResourcesAccessCount> findResourceAccessCount(String type, Date day) throws Exception {
 //        return docCountByTimestamp(type, "doc['resource_name'].value");
-        CyclePojo cyclePojo = docCountByTimestamp(type, "doc['resource_name'].value");
+        CyclePojo cycle = getCycle(type, day);
+        CyclePojo cyclePojo = docCountByTimestamp(cycle, "doc['resource_name'].value");
         List<ResourcesAccessCount> raCounts = new ArrayList<>();
         if (null != cyclePojo && null != cyclePojo.getDatas()) {
             for (String k : cyclePojo.getDatas().keySet()) {
                 if (Strings.isNotBlank(k)) {
                     ResourcesAccessCount racount = new ResourcesAccessCount();
-                    racount.setId(Hashing.md5().hashBytes((cyclePojo.getName() + cyclePojo.getValue() + k).getBytes()).toString());
+                    racount.setId(SecurityUtils.md5(cyclePojo.getName() + cyclePojo.getValue() + k));
                     racount.setCount_type(cyclePojo.getName());
                     racount.setCycle(cyclePojo.getValue());
-                    String[] keys = k.split("|");
+                    String[] keys = k.split("\\|");
                     racount.setResource_name(k);
                     // 获取配置的应用库名称
                     racount.setDomain_name("");
                     racount.setAccess_count((long) cyclePojo.getDatas().get(k));
-                    racount.setCreate_at(new Date());
+                    racount.setCreate_at(DateUtils.datetime2string(new Date()));
                     raCounts.add(racount);
                 }
             }
@@ -142,22 +145,23 @@ public class ResourceLogServiceImpl extends GeneralAbstractServiceImpl<ResourceL
     }
 
     @Override
-    public List<UserAccessCount> findUserAccessCount(String type) throws Exception {
-        CyclePojo cyclePojo = docCountByTimestamp(type, "doc['full_name'].value + '|' + doc['user_name'].value + '|' + doc['user_group'].value");
+    public List<UserAccessCount> findUserAccessCount(String type, Date day) throws Exception {
+        CyclePojo cycle = getCycle(type, day);
+        CyclePojo cyclePojo = docCountByTimestamp(cycle, "doc['full_name'].value + '|' + doc['user_name'].value + '|' + doc['user_group'].value");
         List<UserAccessCount> uaCounts = new ArrayList<>();
         if (null != cyclePojo && null != cyclePojo.getDatas()) {
             for (String k : cyclePojo.getDatas().keySet()) {
-                if (Strings.isNotBlank(k) && !k.replaceAll("|", "").equals("")) {
+                if (Strings.isNotBlank(k) && !k.replaceAll("\\|", "").equals("")) {
                     UserAccessCount uacount = new UserAccessCount();
-                    uacount.setId(Hashing.md5().hashBytes((cyclePojo.getName() + cyclePojo.getValue() + k).getBytes()).toString());
+                    uacount.setId(SecurityUtils.md5(cyclePojo.getName() + cyclePojo.getValue() + k));
                     uacount.setCount_type(cyclePojo.getName());
                     uacount.setCycle(cyclePojo.getValue());
-                    String[] keys = k.split("|");
+                    String[] keys = k.split("\\|");
                     uacount.setFull_name(keys[0]);
                     uacount.setUsername(keys[1]);
                     uacount.setUser_group(keys[2]);
                     uacount.setAccess_count((long) cyclePojo.getDatas().get(k));
-                    uacount.setCreate_at(new Date());
+                    uacount.setCreate_at(DateUtils.datetime2string(new Date()));
                     uaCounts.add(uacount);
                 }
             }

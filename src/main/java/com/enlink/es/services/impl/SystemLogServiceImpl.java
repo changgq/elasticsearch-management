@@ -50,7 +50,7 @@ public class SystemLogServiceImpl extends GeneralAbstractServiceImpl<SystemLog> 
                         "      },\n" +
                         "      \"create_at\": {\n" +
                         "        \"type\": \"date\",\n" +
-                        "        \"format\": \"yyyy-MM-dd HH:mm:ss\"\n" +
+                        "        \"format\": \"strict_date_optional_time||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss.SSS||dd/MMM/yyyy:HH:mm:ss Z||epoch_millis\"\n" +
                         "      }\n" +
                         "    }\n" +
                         "  }\n" +

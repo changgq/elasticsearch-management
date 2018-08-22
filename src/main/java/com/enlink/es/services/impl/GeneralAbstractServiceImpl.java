@@ -56,15 +56,21 @@ public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> impleme
     @Override
     public void createIndex() throws Exception {
         // 判断索引是否存在
+        LOGGER.info("test 1 ......");
         if (!isExists()) {
+            LOGGER.info("test 2 ......");
             // 获取索引创建信息
             IndicesCreateInfo ci = getIndicesCI();
+            LOGGER.info("test 3 ......");
             // 创建索引
             CreateIndexRequest request = new CreateIndexRequest(ci.getName());
+            LOGGER.info("test 4 ......");
             // 通过json字符串创建索引
             if (Strings.isNotBlank(ci.getSource())) {
+                LOGGER.info("test 5 ......");
                 request.source(ci.getSource(), XContentType.JSON);
             } else {
+                LOGGER.info("test 6 ......");
                 request.settings(Settings.builder()
                         .put("index.number_of_shards", ci.getNumber_of_shards())
                         .put("index.number_of_replicas", ci.getNumber_of_replicas())
@@ -88,6 +94,7 @@ public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> impleme
                     request.waitForActiveShards(ci.getWaitForActiveShards());
                 }
             }
+            LOGGER.info("test 7 ......");
             if (ci.isAsync()) {
                 getClient().indices().createAsync(request, new ActionListener<CreateIndexResponse>() {
                     @Override
@@ -183,7 +190,8 @@ public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> impleme
 
     @Override
     public List<T> findByCycleType(Class<T> cls, Map<String, Object> conditions, String count_type, int top) throws Exception {
-        CyclePojo cycle = getCycle(count_type);
+        Date yesterday = DateUtils.getYesterday();
+        CyclePojo cycle = getCycle(count_type, yesterday);
         SearchRequest request = new SearchRequest(getIndicesCI().getName());
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.query(QueryBuilders.termQuery("count_type", cycle.getName()));
@@ -272,9 +280,8 @@ public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> impleme
      * @return
      * @throws Exception
      */
-    protected CyclePojo docCountByTimestamp(String type, String scripts) throws Exception {
+    protected CyclePojo docCountByTimestamp(CyclePojo cycle, String scripts) throws Exception {
         List<Map<String, Object>> datas = new ArrayList<>();
-        CyclePojo cycle = getCycle(type);
 
         SearchRequest request = new SearchRequest().indices(getIndicesCI().getName());
 
@@ -306,28 +313,29 @@ public abstract class GeneralAbstractServiceImpl<T extends GeneralModel> impleme
     }
 
     /**
-     * 根据类型获取周期对象
+     * 根据类型和日期获取周期对象
      *
      * @param count_type
+     * @param date
      * @return
      */
-    protected CyclePojo getCycle(String count_type) {
-        Date yesterday = DateUtils.getYesterday();
+    protected CyclePojo getCycle(String count_type, Date date) {
+        Date basicDay = null == date ? DateUtils.getYesterday() : date;
         CyclePojo cyclePojo = new CyclePojo();
         cyclePojo.setName(count_type);
         cyclePojo.setPattern("yyyy-MM-dd");
         if ("month".equals(count_type)) {
-            cyclePojo.setValue(DateUtils.date2monthstring(yesterday));
-            cyclePojo.setFrom(DateUtils.date2string(DateUtils.firstDayOfMonth(yesterday)));
-            cyclePojo.setTo(DateUtils.date2string(DateUtils.lastDayOfMonth(yesterday)));
+            cyclePojo.setValue(DateUtils.date2monthstring(basicDay));
+            cyclePojo.setFrom(DateUtils.date2string(DateUtils.firstDayOfMonth(basicDay)));
+            cyclePojo.setTo(DateUtils.date2string(DateUtils.lastDayOfMonth(basicDay)));
         } else if ("year".equals(count_type)) {
-            cyclePojo.setValue(DateUtils.date2yearstring(yesterday));
-            cyclePojo.setFrom(DateUtils.date2string(DateUtils.firstDayOfYear(yesterday)));
-            cyclePojo.setTo(DateUtils.date2string(DateUtils.lastDayOfYear(yesterday)));
+            cyclePojo.setValue(DateUtils.date2yearstring(basicDay));
+            cyclePojo.setFrom(DateUtils.date2string(DateUtils.firstDayOfYear(basicDay)));
+            cyclePojo.setTo(DateUtils.date2string(DateUtils.lastDayOfYear(basicDay)));
         } else {
-            cyclePojo.setValue(DateUtils.date2string(yesterday));
-            cyclePojo.setFrom(DateUtils.date2string(yesterday));
-            cyclePojo.setTo(DateUtils.date2string(yesterday));
+            cyclePojo.setValue(DateUtils.date2string(basicDay));
+            cyclePojo.setFrom(DateUtils.date2string(basicDay));
+            cyclePojo.setTo(DateUtils.date2string(basicDay));
         }
         return cyclePojo;
     }

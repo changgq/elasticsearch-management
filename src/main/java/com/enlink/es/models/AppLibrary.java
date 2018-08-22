@@ -1,9 +1,9 @@
 package com.enlink.es.models;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -13,6 +13,7 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class AppLibrary extends GeneralModel {
     private String id;
     private String app_name;
