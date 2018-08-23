@@ -24,6 +24,17 @@ public class DateUtils {
         return calendar.getTime();
     }
 
+    public static Date plus(Date day, int days) {
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(day);
+        calendar.add(Calendar.DATE, days);
+        return calendar.getTime();
+    }
+
+    public static Date minus(Date day, int days) {
+        return plus(day, days * -1);
+    }
+
     /**
      * 获取当前日期的月份
      *
