@@ -22,7 +22,7 @@ public class SystemLog extends GeneralModel {
     // 日志时间
     private Date log_time;
     // 操作方式：CPU、HDD、RAM、网卡流量、服务名称
-    private String type;
+    private String operate_type;
     // 日志详细信息
     private String log_info;
 }

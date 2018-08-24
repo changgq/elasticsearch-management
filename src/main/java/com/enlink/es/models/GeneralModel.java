@@ -8,6 +8,8 @@ import java.util.Map;
 
 @Data
 public class GeneralModel {
+    // 主键
+    private String id;
     // 创建时间
     private String create_at;
 

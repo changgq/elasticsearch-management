@@ -15,8 +15,10 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class AppLibrary extends GeneralModel {
-    private String id;
+    // App名称
     private String app_name;
+    // 描述
     private String description;
+    // App urls
     private List<String> app_urls;
 }

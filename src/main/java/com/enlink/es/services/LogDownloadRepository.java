@@ -7,5 +7,6 @@ import com.enlink.es.models.LogDownload;
  *
  * @author changgq
  */
-public interface LogDownloadService extends GeneralService<LogDownload> {
+public interface LogDownloadRepository extends GeneralRepository<LogDownload> {
+
 }

@@ -16,8 +16,6 @@ import java.util.*;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class LogSetting extends GeneralModel {
-    // 主键
-    private String id;
     // 是否启用第三方数据库
     private boolean use_third_db;
     // 日志清理类型，按日期、按数量
@@ -46,7 +44,7 @@ public class LogSetting extends GeneralModel {
      *
      * @return
      */
-    public LogSetting initial() {
+    public static LogSetting initial() {
         LogSetting logSetting = new LogSetting();
         logSetting.setId("1");
         logSetting.setUse_third_db(false);
@@ -60,6 +58,7 @@ public class LogSetting extends GeneralModel {
         logSetting.setLog_types(Arrays.asList("RES", "USER", "ADMIN", "SYSTEM"));
         logSetting.setLog_levels(Arrays.asList("INFO", "WARNING", "ERROR"));
         logSetting.setLast_count_date(DateUtils.date2string(new Date()));
+        logSetting.setCreate_at(DateUtils.datetime2string(new Date()));
         return logSetting;
     }
 }

@@ -4,7 +4,7 @@ server:
     path: /es-management
 
 elasticsearch:
-  host: http://49.4.9.225:9200
+  hosts: 49.4.9.225:9200
   username:
   password:
   index:
@@ -12,10 +12,18 @@ elasticsearch:
     resources: res-filebeat
     admin: admin-filebeat
     system: system-filebeat
-    userAccess: user-access-count
-    userLogin: user-login-count
-    resourceAccess: res-access-count
     logSetting: .log-setting
     logDownload: .log-download
     appLibrary: .app-library
-
+    topRanking: top-ranking
+    filebeat: filebeat
+  # 查询相关设置
+  query:
+    maxTotal: 10000
+  # 统计周期
+  count:
+    cycles: day,month,year
+  # 别名相关设置
+  aliases:
+    # 别名前缀
+    prefixs: user,admin,res,system

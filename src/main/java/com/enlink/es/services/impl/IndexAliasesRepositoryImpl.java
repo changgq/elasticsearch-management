@@ -25,20 +25,30 @@ public class IndexAliasesRepositoryImpl implements IndexAliasesRepository {
     private RestHighLevelClient esClient;
 
     @Override
-    public void add(String[] indices, String alias, String filter) throws Exception {
+    public void add(String index, String alias, String filter) throws Exception {
+        LOGGER.info("Create Index Alias: Index==== " + index);
+        LOGGER.info("Create Index Alias: Alias==== " + alias);
+        LOGGER.info("Create Index Alias: Filter==== " + filter);
         IndicesAliasesRequest request = new IndicesAliasesRequest();
         IndicesAliasesRequest.AliasActions aliasAction =
                 new IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.ADD)
-                        .indices(indices)
+                        .index(index)
                         .alias(alias)
                         .filter(filter);
         request.addAliasAction(aliasAction);
         IndicesAliasesResponse indicesAliasesResponse = esClient.indices().updateAliases(request);
         boolean acknowledged = indicesAliasesResponse.isAcknowledged();
+        if (acknowledged) {
+            LOGGER.info("Create Index Alias: success!");
+        } else {
+            LOGGER.error("Create Index Alias: failure!");
+        }
     }
 
     @Override
     public void delete(String index, String alias) throws Exception {
+        LOGGER.info("Delete Index Alias: Index==== " + index);
+        LOGGER.info("Delete Index Alias: Alias==== " + alias);
         if (isExixts(index, alias)) {
             IndicesAliasesRequest request = new IndicesAliasesRequest();
             IndicesAliasesRequest.AliasActions aliasAction =
@@ -48,6 +58,11 @@ public class IndexAliasesRepositoryImpl implements IndexAliasesRepository {
             request.addAliasAction(aliasAction);
             IndicesAliasesResponse indicesAliasesResponse = esClient.indices().updateAliases(request);
             boolean acknowledged = indicesAliasesResponse.isAcknowledged();
+            if (acknowledged) {
+                LOGGER.info("Delete Index Alias: success!");
+            } else {
+                LOGGER.error("Delete Index Alias: failure!");
+            }
         }
     }
 

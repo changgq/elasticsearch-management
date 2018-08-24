@@ -1,32 +1,37 @@
 package com.enlink.es.services.impl;
 
 import com.enlink.es.base.IndicesCreateInfo;
+import com.enlink.es.config.ElasticsearchConfig;
 import com.enlink.es.models.LogSetting;
-import com.enlink.es.services.LogSettingService;
+import com.enlink.es.services.LogSettingRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class LogSettingServiceImpl extends GeneralAbstractServiceImpl<LogSetting> implements LogSettingService {
-
-    @Value("${elasticsearch.index.logSetting}")
-    private String logSettingIndex;
+public class LogSettingRepositoryImpl extends AbstractGeneralRepository<LogSetting> implements LogSettingRepository {
 
     @Autowired
-    private RestHighLevelClient elasticsearch;
+    private ElasticsearchConfig esConfig;
+
+    @Autowired
+    private RestHighLevelClient esClient;
 
     @Override
-    public RestHighLevelClient getClient() throws Exception {
-        return elasticsearch;
+    public RestHighLevelClient getClient() {
+        return esClient;
     }
 
     @Override
-    public IndicesCreateInfo getIndicesCI() throws Exception {
-        return new IndicesCreateInfo.IndicesCIBuilder(logSettingIndex)
+    public ElasticsearchConfig getEsConfig() {
+        return esConfig;
+    }
+
+    @Override
+    public IndicesCreateInfo getIndicesCI() {
+        return new IndicesCreateInfo.IndicesCIBuilder(esConfig.getLogSettingIndex())
                 .setMappings("{\n" +
                         "  \"doc\": {\n" +
                         "    \"properties\": {\n" +

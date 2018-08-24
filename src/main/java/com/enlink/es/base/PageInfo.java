@@ -1,19 +1,20 @@
 package com.enlink.es.base;
 
-import com.enlink.es.models.GeneralModel;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.elasticsearch.search.SearchHit;
 
-import java.util.List;
-
+/**
+ * 分页数据
+ *
+ * @author changgq
+ */
 @Data
 @NoArgsConstructor
-public class PageData {
+public class PageInfo {
+    private SearchHit[] data;
+    private String scrollId;
     private int pageIndex;
     private int pageSize;
     private long total;
-    private SearchHit[] data;
-    private String scrollId;
 }

@@ -64,6 +64,16 @@ public class DateUtils {
     }
 
     /**
+     * 日期转化为字符串
+     *
+     * @param day
+     * @return {yyyy-MM-dd}
+     */
+    public static String date2stringPoint(Date day) {
+        return new SimpleDateFormat("yyyy.MM.dd").format(day);
+    }
+
+    /**
      * 日期转化为月份
      *
      * @param day
@@ -113,6 +123,29 @@ public class DateUtils {
      */
     public static Date string2datetime(String day) throws ParseException {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(day);
+    }
+
+    /**
+     * 当天起始时间
+     *
+     * @return
+     */
+    public static Date firstSecond(Date day) {
+        Calendar cal = new GregorianCalendar();
+        cal.set(day.getYear() + 1900, day.getMonth(), day.getDate(), 0, 0, 0);
+        return cal.getTime();
+    }
+
+    /**
+     * 当天起始时间
+     *
+     * @return
+     */
+    public static Date lastSecond(Date day) {
+        Calendar cal = new GregorianCalendar();
+        cal.set(day.getYear() + 1900, day.getMonth(), day.getDate() + 1, 0, 0, 0);
+        cal.add(Calendar.SECOND, -1);
+        return cal.getTime();
     }
 
     /**

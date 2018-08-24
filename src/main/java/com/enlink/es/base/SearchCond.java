@@ -5,14 +5,17 @@ import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
+/**
+ * 查询条件
+ *
+ * @author changgq
+ */
 @Data
 @NoArgsConstructor
-public class Condt {
-    private String cycleType;
-    private String cycle;
-    private Map<String, Object> terms;
-    private Map<String, Object> fuzziness;
+public class SearchCond {
     private int pageIndex;
     private int pageSize;
+    private Map<String, Object> terms;
+    private Map<String, Object> fuzziness;
 }
 

@@ -13,10 +13,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class LogDownload extends GeneralModel {
-    private String id;
+    // 文件名
     private String file_name;
+    // 文件存放路径
+    private String file_path;
+    // 文件大小
     private long file_size;
+    // 生成状态
     private float percent;
+    // 日志类型
     private String log_type;
-    private long download_count;
 }

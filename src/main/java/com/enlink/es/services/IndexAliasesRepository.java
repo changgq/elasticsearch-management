@@ -13,12 +13,12 @@ public interface IndexAliasesRepository {
     /**
      * 按过滤条件为索引添加别名
      *
-     * @param indices
+     * @param index
      * @param alias
      * @param filter
      * @throws Exception
      */
-    void add(String[] indices, String alias, String filter) throws Exception;
+    void add(String index, String alias, String filter) throws Exception;
 
     /**
      * 删除索引对应别名

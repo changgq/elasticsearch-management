@@ -6,4 +6,5 @@ package com.enlink.es.base;
  * @author changgq
  */
 public class BaseAction {
+
 }

@@ -1,12 +1,15 @@
 package com.enlink.es.tasks;
 
+import com.enlink.es.base.CountCycle;
+import com.enlink.es.config.ElasticsearchConfig;
 import com.enlink.es.models.LogSetting;
 import com.enlink.es.services.IndexAliasesRepository;
 import com.enlink.es.services.IndexRepository;
+import com.enlink.es.services.LogSettingRepository;
 import com.enlink.es.utils.DateUtils;
+import com.enlink.es.utils.GsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -22,8 +25,8 @@ import java.util.Date;
 @Component
 public class DeleteTask {
 
-    @Value("${elasticsearch.index.filebeat}")
-    private String filebeatIndex;
+    @Autowired
+    private ElasticsearchConfig esConfig;
 
     @Autowired
     private IndexRepository indexRepository;
@@ -31,32 +34,36 @@ public class DeleteTask {
     @Autowired
     private IndexAliasesRepository indexAliasesRepository;
 
+    @Autowired
+    private LogSettingRepository logSettingRepository;
+
     /**
      * 每日凌晨1点执行删除任务
      */
     @Async
-    @Scheduled(cron = "0 */2 * * * ?") // 凌晨1点：0 0 0 * * ?
+    @Scheduled(cron = "0 0 0 * * ?")
     public void run() {
-        LOGGER.info("Daily delete Index task start......");
+        LOGGER.info("Daily Delete Index Task: start......");
         try {
-            // 查询logsetting信息
-            LogSetting logSetting = new LogSetting();
-
-            String lastDelete = logSetting.getLast_delete_date();
-            Date startTime = DateUtils.string2date(lastDelete);
-            Date endTime = DateUtils.minus(new Date(), (int) logSetting.getDay_rate());
-            while (startTime.getTime() < endTime.getTime()) {
-                deleteIndex(filebeatIndex, startTime);
-                startTime = DateUtils.plus(startTime, 1);
+            // Get LogSetting info by id = 1.
+            if (logSettingRepository.documentIsExists("1")) {
+                LogSetting logSetting = GsonUtils.reConvert2Object(logSettingRepository.findById("1"), LogSetting.class);
+                String lastDelete = logSetting.getLast_delete_date();
+                Date startTime = DateUtils.string2date(lastDelete);
+                Date endTime = DateUtils.minus(new Date(), (int) logSetting.getDay_rate());
+                while (startTime.getTime() < endTime.getTime()) {
+                    deleteIndex(esConfig.getFilebeatIndex(), startTime);
+                    startTime = DateUtils.plus(startTime, 1);
+                }
+                logSetting.setLast_delete_date(DateUtils.date2string(endTime));
+                // Update LogSetting Info.
+                logSettingRepository.saveOrUpdate(logSetting);
             }
-            logSetting.setLast_delete_date(DateUtils.date2string(endTime));
-            // 更新logsetting信息
-
         } catch (Exception e) {
-            LOGGER.error("定时删除任务执行失败，失败原因：" + e.getMessage());
+            LOGGER.error("Daily Delete Index Task: failure, The Reason: " + e.getMessage());
             e.printStackTrace();
         }
-        LOGGER.info("Daily delete Index task end !");
+        LOGGER.info("Daily Delete Index Task: end !");
     }
 
     /**
@@ -66,12 +73,15 @@ public class DeleteTask {
      * @param day
      */
     private void deleteIndex(String index, Date day) throws Exception {
-        String[] aliasesName = {"user", "res"};
-        for (String aliase : aliasesName) {
-            indexAliasesRepository.delete(index, aliase + "-" + DateUtils.date2string(day));
-            indexAliasesRepository.delete(index, aliase + "-" + DateUtils.date2monthstring(day));
-            indexAliasesRepository.delete(index, aliase + "-" + DateUtils.date2yearstring(day));
+        // 循环所有别名前缀
+        for (String prefix : esConfig.genAliasesPrefixs()) {
+            // 循环所有统计周期
+            for (String cl : esConfig.genCountCycles()) {
+                CountCycle cy = CountCycle.getCountCycle("", cl, day);
+                indexAliasesRepository.delete(index, prefix + "-" + cy.getCycle());
+            }
         }
+        // 关闭索引
         indexRepository.close(index);
     }
 }

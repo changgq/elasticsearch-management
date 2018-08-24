@@ -1,12 +1,12 @@
 package com.enlink.es.services.impl;
 
 import com.enlink.es.base.IndicesCreateInfo;
+import com.enlink.es.config.ElasticsearchConfig;
 import com.enlink.es.models.LogDownload;
-import com.enlink.es.services.LogDownloadService;
+import com.enlink.es.services.LogDownloadRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,22 +16,27 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class LogDownloadServiceImpl extends GeneralAbstractServiceImpl<LogDownload> implements LogDownloadService {
-
-    @Value("elasticsearch.index.logDownload")
-    private String logDownloadIndex;
+public class LogDownloadRepositoryImpl extends AbstractGeneralRepository<LogDownload> implements LogDownloadRepository {
 
     @Autowired
-    private RestHighLevelClient elasticsearch;
+    private ElasticsearchConfig esConfig;
+
+    @Autowired
+    private RestHighLevelClient esClient;
 
     @Override
-    public RestHighLevelClient getClient() throws Exception {
-        return elasticsearch;
+    public RestHighLevelClient getClient() {
+        return esClient;
     }
 
     @Override
-    public IndicesCreateInfo getIndicesCI() throws Exception {
-        return new IndicesCreateInfo.IndicesCIBuilder(logDownloadIndex)
+    public ElasticsearchConfig getEsConfig() {
+        return esConfig;
+    }
+
+    @Override
+    public IndicesCreateInfo getIndicesCI() {
+        return new IndicesCreateInfo.IndicesCIBuilder(esConfig.getLogDownloadIndex())
                 .setMappings("{\n" +
                         "  \"doc\": {\n" +
                         "    \"properties\": {\n" +
@@ -39,7 +44,10 @@ public class LogDownloadServiceImpl extends GeneralAbstractServiceImpl<LogDownlo
                         "        \"type\": \"keyword\"\n" +
                         "      },\n" +
                         "      \"file_name\": {\n" +
-                        "        \"type\": \"boolean\"\n" +
+                        "        \"type\": \"keyword\"\n" +
+                        "      },\n" +
+                        "      \"file_path\": {\n" +
+                        "        \"type\": \"keyword\"\n" +
                         "      },\n" +
                         "      \"file_size\": {\n" +
                         "        \"type\": \"long\"\n" +
@@ -49,9 +57,6 @@ public class LogDownloadServiceImpl extends GeneralAbstractServiceImpl<LogDownlo
                         "      },\n" +
                         "      \"log_type\": {\n" +
                         "        \"type\": \"keyword\"\n" +
-                        "      },\n" +
-                        "      \"download_count\": {\n" +
-                        "        \"type\": \"long\"\n" +
                         "      },\n" +
                         "      \"create_at\": {\n" +
                         "        \"type\": \"date\",\n" +

@@ -1,7 +1,7 @@
 package com.enlink.es.services.impl;
 
 import com.enlink.es.dto.ClusterInfoDto;
-import com.enlink.es.services.MiscellaneousService;
+import com.enlink.es.services.MiscellaneousRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.main.MainResponse;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -16,14 +16,14 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class MiscellaneousServiceImpl implements MiscellaneousService {
+public class MiscellaneousRepositoryImpl implements MiscellaneousRepository {
 
     @Autowired
-    private RestHighLevelClient elasticsearch;
+    private RestHighLevelClient esClient;
 
     @Override
     public ClusterInfoDto info() throws Exception {
-        MainResponse response = elasticsearch.info();
+        MainResponse response = esClient.info();
         ClusterInfoDto info = new ClusterInfoDto();
         info.setName(response.getNodeName());
         info.setClusterName(response.getClusterName().value());
@@ -35,6 +35,6 @@ public class MiscellaneousServiceImpl implements MiscellaneousService {
 
     @Override
     public Boolean ping() throws Exception {
-        return elasticsearch.ping();
+        return esClient.ping();
     }
 }

@@ -5,7 +5,7 @@ import com.enlink.es.dto.ClusterInfoDto;
 /**
  * 混合Service
  */
-public interface MiscellaneousService {
+public interface MiscellaneousRepository {
     /**
      * 查询集群信息
      *

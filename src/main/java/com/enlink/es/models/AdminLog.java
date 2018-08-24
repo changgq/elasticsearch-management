@@ -35,5 +35,4 @@ public class AdminLog extends GeneralModel {
     private String mac_address;
     // 日志详细信息
     private String log_info;
-
 }
