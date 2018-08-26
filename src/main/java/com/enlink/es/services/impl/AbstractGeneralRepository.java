@@ -193,7 +193,7 @@ public abstract class AbstractGeneralRepository<T extends GeneralModel> implemen
     public PageInfo findByPaging(SearchCond searchCond) throws Exception {
         // 根据条件查询所有数据，超过10000条的记录，按照分页查询。
         LOGGER.info("Indices Paging Search start ......");
-        SearchRequest request = new SearchRequest();
+        SearchRequest request = new SearchRequest(getIndicesCI().getName());
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.query(queryBuild(searchCond.getTerms(), searchCond.getFuzziness()));
         sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
@@ -206,9 +206,9 @@ public abstract class AbstractGeneralRepository<T extends GeneralModel> implemen
         sourceBuilder.size(searchCond.getPageSize());
         request.source(sourceBuilder);
 
-        LOGGER.debug("Elasticsearch Query : " + request.toString());
+        LOGGER.info("Elasticsearch Query : " + request.toString());
         SearchResponse response = getClient().search(request);
-        LOGGER.debug("Elasticsearch Query results : " + response.getHits());
+        LOGGER.info("Elasticsearch Query results : " + response.getHits());
 
         // 总记录超过10000的，则总是为10000，因为Elasticsearch分页查询只支持10000以内的。
         long total = 0L;

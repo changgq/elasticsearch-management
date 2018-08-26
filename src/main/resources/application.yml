@@ -8,15 +8,10 @@ elasticsearch:
   username:
   password:
   index:
-    user: user-filebeat
-    resources: res-filebeat
-    admin: admin-filebeat
-    system: system-filebeat
     logSetting: .log-setting
     logDownload: .log-download
     appLibrary: .app-library
     topRanking: top-ranking
-    filebeat: filebeat
   # 查询相关设置
   query:
     maxTotal: 10000
@@ -27,3 +22,12 @@ elasticsearch:
   aliases:
     # 别名前缀
     prefixs: user,admin,res,system
+  filebeat:
+    version: 6.3.1
+    index: filebeat
+  metribeat:
+    version: 6.3.1
+    # 临时文件保存路径
+  file:
+    tmp: /tmp/es/
+    download: /tmp/es/download/

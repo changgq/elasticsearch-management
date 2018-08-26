@@ -1,6 +1,7 @@
 package com.enlink.es.controllers;
 
 import com.enlink.es.base.BaseAction;
+import com.enlink.es.base.PageInfo;
 import com.enlink.es.base.SearchCond;
 import com.enlink.es.controllers.responses.AjaxResults;
 import com.enlink.es.controllers.responses.ResultCode;
@@ -36,8 +37,8 @@ public class LogDownloadController extends BaseAction {
      */
     @PostMapping("/list")
     public AjaxResults list(@RequestBody SearchCond searchCond) throws Exception {
-        List<LogDownload> logDownloads = (List<LogDownload>) logDownloadRepository.findByPaging(searchCond);
-        return Results.resultOf(ResultCode.OK, null);
+        PageInfo pageInfo = logDownloadRepository.findByPaging(searchCond);
+        return Results.resultOf(ResultCode.OK, pageInfo);
     }
 
     /**

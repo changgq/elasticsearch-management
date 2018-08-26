@@ -1,6 +1,7 @@
 package com.enlink.es.controllers;
 
 import com.enlink.es.base.BaseAction;
+import com.enlink.es.config.ElasticsearchConfig;
 import com.enlink.es.controllers.responses.AjaxResults;
 import com.enlink.es.controllers.responses.ResultCode;
 import com.enlink.es.controllers.responses.Results;
@@ -27,28 +28,30 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
 
+import static com.enlink.es.common.DateTimeUtilsKt.firstSecond;
+import static com.enlink.es.common.DateTimeUtilsKt.lastSecond;
+import static com.enlink.es.common.IndexNameUtilsKt.metricbeatName;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/network/")
 public class NetworkController extends BaseAction {
     @Autowired
     private RestHighLevelClient esClient;
-    private String field;
+
+    @Autowired
+    private ElasticsearchConfig esConfig;
 
     @GetMapping("/traffic")
     public AjaxResults traffic() throws Exception {
-        String today = DateUtils.date2string(new Date());
+        Date today = new Date();
         SearchRequest request = new SearchRequest();
-        request.indices("metricbeat-6.3.1-" + DateUtils.date2stringPoint(new Date()));
-        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        sourceBuilder.size(0);
-
-        String from = DateUtils.date2string(DateUtils.firstSecond(new Date()));
-        String to = DateUtils.date2string(DateUtils.lastSecond(new Date()));
+        request.indices(metricbeatName(esConfig.getMetricbeatVersion()));
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder().size(0);
 
         String field = "@timestamp";
         AggregationBuilder aggs = AggregationBuilders.dateRange("dateRange").field(field)
-                .format("yyyy-MM-dd HH:mm:ss").addUnboundedFrom(from).addUnboundedTo(to)
+                .addRange(new DateTime(firstSecond(today)),new DateTime(lastSecond(today))).keyed(true)
                 .subAggregation(AggregationBuilders.dateHistogram("network_speed_per_day")
                         .field(field).interval(10)
                         .dateHistogramInterval(DateHistogramInterval.MINUTE)

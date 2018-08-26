@@ -17,9 +17,6 @@ public class ElasticsearchConfig {
     @Value("${elasticsearch.password}")
     private String password;
 
-    @Value("${elasticsearch.index.filebeat}")
-    private String filebeatIndex;
-
     @Value("${elasticsearch.index.logSetting}")
     private String logSettingIndex;
 
@@ -40,6 +37,21 @@ public class ElasticsearchConfig {
 
     @Value("${elasticsearch.aliases.prefixs}")
     private String aliasesPrefixs;
+
+    @Value("${elasticsearch.filebeat.index}")
+    private String filebeatIndex;
+
+    @Value("${elasticsearch.filebeat.version}")
+    private String filebeatVersion;
+
+    @Value("${elasticsearch.metribeat.version}")
+    private String metricbeatVersion;
+
+    @Value("${elasticsearch.file.tmp}")
+    private String tmpPath;
+
+    @Value("${elasticsearch.file.download}")
+    private String tmpDownload;
 
     public String[] genHosts() {
         if (Strings.isNotBlank(hosts)) {

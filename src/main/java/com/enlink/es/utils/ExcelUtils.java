@@ -2,6 +2,7 @@ package com.enlink.es.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,7 +81,7 @@ public class ExcelUtils {
      * @return
      * @throws Exception
      */
-    public static List<Map<String, String>> getExcelData(FileInputStream input, boolean isXls) throws Exception {
+    public static List<Map<String, String>> getExcelData(InputStream input, boolean isXls) throws Exception {
         return getExcelData(input, isXls, 0, 0);
     }
 
@@ -94,7 +95,7 @@ public class ExcelUtils {
      * @return
      * @throws Exception
      */
-    public static List<Map<String, String>> getExcelData(FileInputStream input, boolean isXls, int sheetNum,
+    public static List<Map<String, String>> getExcelData(InputStream input, boolean isXls, int sheetNum,
                                                          int startRow) throws Exception {
         return getExcelData2Map(input, isXls, sheetNum, startRow);
     }
@@ -107,7 +108,7 @@ public class ExcelUtils {
      * @param cellNos
      * @return
      */
-    public static Map<String, String> getCellValues(FileInputStream input, boolean isXls, List<String> cellNos) {
+    public static Map<String, String> getCellValues(InputStream input, boolean isXls, List<String> cellNos) {
         Map<String, String> map = new HashMap<String, String>();
         Workbook wb = getWorkbook(input, isXls);
         if (!wb.isSheetHidden(0)) {
@@ -133,7 +134,7 @@ public class ExcelUtils {
      * @throws Exception
      */
     private static List<Map<String, String>> getExcelData2Map(File file, int sheetNum, int startRow) throws Exception {
-        try (FileInputStream input = new FileInputStream(file)) {
+        try (InputStream input = new FileInputStream(file)) {
             return getExcelData2Map(input, file.getName().toLowerCase().endsWith("xls"), sheetNum, startRow);
         } catch (Exception e) {
             e.printStackTrace();
@@ -151,7 +152,7 @@ public class ExcelUtils {
      * @return
      * @throws Exception
      */
-    private static List<Map<String, String>> getExcelData2Map(FileInputStream input, boolean isXls, int sheetNum,
+    private static List<Map<String, String>> getExcelData2Map(InputStream input, boolean isXls, int sheetNum,
                                                               int startRow) throws Exception {
         List<Map<String, String>> listMap = new ArrayList<Map<String, String>>();
         Workbook wb = null;
@@ -190,7 +191,7 @@ public class ExcelUtils {
      * @return
      * @throws IOException
      */
-    private static Workbook getWorkbook(FileInputStream input, boolean isXls) {
+    private static Workbook getWorkbook(InputStream input, boolean isXls) {
         Workbook wb = null;
         try {
             // 根据文件格式(2003或者2007)来初始化
