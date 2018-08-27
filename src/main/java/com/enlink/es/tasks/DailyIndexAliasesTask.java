@@ -32,7 +32,7 @@ public class DailyIndexAliasesTask {
      * @desc 凌晨0点：0 0 0 * * ?
      */
     @Async
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 25 * * * ?")
     public void run() {
         LOGGER.info("Daily Create Index Aliase Task: start......");
         try {

@@ -24,6 +24,7 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
@@ -42,7 +43,7 @@ public class NetworkController extends BaseAction {
     @Autowired
     private ElasticsearchConfig esConfig;
 
-    @GetMapping("/traffic")
+    @RequestMapping(value = "/traffic", method = {RequestMethod.GET})
     public AjaxResults traffic() throws Exception {
         Date today = new Date();
         SearchRequest request = new SearchRequest();

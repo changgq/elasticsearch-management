@@ -22,6 +22,7 @@ elasticsearch:
   aliases:
     # 别名前缀
     prefixs: user,admin,res,system
+
   filebeat:
     version: 6.3.1
     index: filebeat

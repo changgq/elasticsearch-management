@@ -169,7 +169,7 @@ public abstract class AbstractGeneralRepository<T extends GeneralModel> implemen
      * @param fuzziness
      * @return
      */
-    public QueryBuilder queryBuild(Map<String, Object> terms, Map<String, Object> fuzziness) {
+    public QueryBuilder queryBuild(Map<String, String> terms, Map<String, String> fuzziness) {
         // 如果条件为空则返回匹配所有行
         if (null == terms && null == fuzziness) {
             return QueryBuilders.matchAllQuery();
@@ -182,15 +182,52 @@ public abstract class AbstractGeneralRepository<T extends GeneralModel> implemen
         }
         if (null != fuzziness) {
             for (String fuzzKey : fuzziness.keySet()) {
-                booleanQuery.must(QueryBuilders.matchQuery(fuzzKey, fuzziness.get(fuzzKey)).fuzziness(Fuzziness.AUTO));
+                booleanQuery.must(QueryBuilders.wildcardQuery(fuzzKey, "*" + fuzziness.get(fuzzKey) + "*"));
             }
         }
         return booleanQuery;
     }
 
 
-    @Override
-    public PageInfo findByPaging(SearchCond searchCond) throws Exception {
+//    @Override
+//    public PageInfo findByPaging(SearchCond searchCond) throws Exception {
+//        // 根据条件查询所有数据，超过10000条的记录，按照分页查询。
+//        LOGGER.info("Indices Paging Search start ......");
+//        SearchRequest request = new SearchRequest(getIndicesCI().getName());
+//        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+//        sourceBuilder.query(queryBuild(searchCond.getTerms(), searchCond.getFuzziness()));
+//        sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
+//        int startIndex = searchCond.getPageIndex() > 0 ? (searchCond.getPageIndex() - 1) * searchCond.getPageSize() : 0;
+//        // 如果下一页的最大值超过10000，则跳转到第1页
+//        if ((startIndex + searchCond.getPageSize()) > 10000) {
+//            startIndex = 0;
+//        }
+//        sourceBuilder.from(startIndex);
+//        sourceBuilder.size(searchCond.getPageSize());
+//        request.source(sourceBuilder);
+//
+//        LOGGER.info("Elasticsearch Query : " + request.toString());
+//        SearchResponse response = getClient().search(request);
+//        LOGGER.info("Elasticsearch Query results : " + response.getHits());
+//
+//        // 总记录超过10000的，则总是为10000，因为Elasticsearch分页查询只支持10000以内的。
+//        long total = 0L;
+//        long totalHits = response.getHits().totalHits;
+//        if (totalHits < Long.valueOf(getEsConfig().getQueryMaxTotal())) {
+//            total = totalHits;
+//        }
+//        LOGGER.info("Indices Paging Search end!");
+//
+//        PageInfo pageInfo = new PageInfo();
+//        pageInfo.setPageIndex(searchCond.getPageIndex());
+//        pageInfo.setPageSize(searchCond.getPageSize());
+//        pageInfo.setTotal(total);
+//        pageInfo.setData(response.getHits().getHits());
+//
+//        return pageInfo;
+//    }
+
+    protected SearchResponse findByPagingCondition(SearchCond searchCond) throws Exception {
         // 根据条件查询所有数据，超过10000条的记录，按照分页查询。
         LOGGER.info("Indices Paging Search start ......");
         SearchRequest request = new SearchRequest(getIndicesCI().getName());
@@ -210,20 +247,6 @@ public abstract class AbstractGeneralRepository<T extends GeneralModel> implemen
         SearchResponse response = getClient().search(request);
         LOGGER.info("Elasticsearch Query results : " + response.getHits());
 
-        // 总记录超过10000的，则总是为10000，因为Elasticsearch分页查询只支持10000以内的。
-        long total = 0L;
-        long totalHits = response.getHits().totalHits;
-        if (totalHits < Long.valueOf(getEsConfig().getQueryMaxTotal())) {
-            total = totalHits;
-        }
-        LOGGER.info("Indices Paging Search end!");
-
-        PageInfo pageInfo = new PageInfo();
-        pageInfo.setPageIndex(searchCond.getPageIndex());
-        pageInfo.setPageSize(searchCond.getPageSize());
-        pageInfo.setTotal(total);
-        pageInfo.setData(response.getHits().getHits());
-
-        return pageInfo;
+        return response;
     }
 }

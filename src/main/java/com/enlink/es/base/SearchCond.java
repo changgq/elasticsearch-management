@@ -15,7 +15,8 @@ import java.util.Map;
 public class SearchCond {
     private int pageIndex;
     private int pageSize;
-    private Map<String, Object> terms;
-    private Map<String, Object> fuzziness;
+    private Map<String, String> terms;
+    private Map<String, String> fuzziness;
+    private Map<String, String> shoulds;
 }
 

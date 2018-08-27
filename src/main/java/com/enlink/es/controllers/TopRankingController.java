@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/topRanking")
@@ -31,7 +30,7 @@ public class TopRankingController extends BaseAction {
      * @return
      * @throws Exception
      */
-    @PostMapping("/top/{topValue}")
+    @RequestMapping(value = "/top/{topValue}", method = RequestMethod.POST, consumes = {"application/json"})
     public AjaxResults top(@RequestBody CountCycle countCycle, @PathVariable int topValue) throws Exception {
         // topValue must between 5 and 100
         if (topValue < 0) {
@@ -44,7 +43,7 @@ public class TopRankingController extends BaseAction {
         return Results.resultOf(ResultCode.OK, topRanks);
     }
 
-    @PostMapping("/list")
+    @RequestMapping(value = "/list", method = RequestMethod.POST, consumes = {"application/json"})
     public AjaxResults paging(@RequestBody SearchCond searchCond) throws Exception {
         PageInfo pageInfo = topRankingRepository.findByPaging(searchCond);
         System.out.println(GsonUtils.convert(pageInfo));

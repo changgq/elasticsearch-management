@@ -24,7 +24,7 @@ group 'com.enlink'
 version '1.0-SNAPSHOT'
 
 bootJar {
-    baseName = 'ES'
+    baseName = 'es-management'
     version = '1.0-SNAPSHOT'
 }
 

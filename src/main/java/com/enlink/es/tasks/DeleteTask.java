@@ -57,6 +57,7 @@ public class DeleteTask {
                 }
                 logSetting.setLast_delete_date(DateUtils.date2string(endTime));
                 // Update LogSetting Info.
+                logSetting.setId("1");
                 logSettingRepository.saveOrUpdate(logSetting);
             }
         } catch (Exception e) {

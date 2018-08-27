@@ -12,7 +12,6 @@ import com.enlink.es.utils.DateUtils;
 import com.enlink.es.utils.ExcelUtils;
 import com.enlink.es.utils.GsonUtils;
 import com.enlink.es.utils.SecurityUtils;
-import com.google.common.collect.Lists;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -38,6 +36,7 @@ public class AppLibraryController extends BaseAction {
 
     /**
      * 增加应用库
+     *
      * @param appLibrary
      * @return
      * @throws Exception
@@ -54,6 +53,7 @@ public class AppLibraryController extends BaseAction {
 
     /**
      * 删除应用库
+     *
      * @param id
      * @return
      * @throws Exception
@@ -65,7 +65,26 @@ public class AppLibraryController extends BaseAction {
     }
 
     /**
+     * 批量删除应用库
+     *
+     * @param ids
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("/deleteBatch")
+    public AjaxResults deleteBatch(@RequestBody String ids) throws Exception {
+        if (Strings.isNotBlank(ids)) {
+            String[] idArray = ids.split(",");
+            for (String id : idArray) {
+                appLibraryRepository.delete(id);
+            }
+        }
+        return Results.resultOf(ResultCode.OK, null);
+    }
+
+    /**
      * 按id查询应用数据
+     *
      * @param id
      * @return
      * @throws Exception
@@ -77,6 +96,7 @@ public class AppLibraryController extends BaseAction {
 
     /**
      * 分页查询应用数据
+     *
      * @param searchCond
      * @return
      * @throws Exception
@@ -90,6 +110,7 @@ public class AppLibraryController extends BaseAction {
 
     /**
      * 批量导入功能（预留）
+     *
      * @param request
      * @param response
      * @return
@@ -113,8 +134,10 @@ public class AppLibraryController extends BaseAction {
         }
         return Results.resultOf(ResultCode.OK, null);
     }
+
     /**
      * 应用库导出（预留）
+     *
      * @param request
      * @param response
      * @return

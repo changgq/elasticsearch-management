@@ -2,8 +2,12 @@ package com.enlink.es.services.impl;
 
 import com.enlink.es.base.CountCycle;
 import com.enlink.es.base.IndicesCreateInfo;
+import com.enlink.es.base.PageInfo;
+import com.enlink.es.base.SearchCond;
 import com.enlink.es.config.ElasticsearchConfig;
 import com.enlink.es.dto.TopRankingDto;
+import com.enlink.es.models.AppLibrary;
+import com.enlink.es.models.LogSetting;
 import com.enlink.es.models.TopRanking;
 import com.enlink.es.services.TopRankingRepository;
 import com.enlink.es.utils.GsonUtils;
@@ -90,6 +94,32 @@ public class TopRankingRepositoryImpl extends AbstractGeneralRepository<TopRanki
                         "  }\n" +
                         "}")
                 .create();
+    }
+
+    @Override
+    public PageInfo<TopRanking> findByPaging(SearchCond searchCond) throws Exception {
+        SearchResponse response = super.findByPagingCondition(searchCond);
+        // 总记录超过10000的，则总是为10000，因为Elasticsearch分页查询只支持10000以内的。
+        long total = 0L;
+        long totalHits = response.getHits().totalHits;
+        if (totalHits < Long.valueOf(getEsConfig().getQueryMaxTotal())) {
+            total = totalHits;
+        }
+        LOGGER.info("Indices Paging Search end!");
+
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setPageIndex(searchCond.getPageIndex());
+        pageInfo.setPageSize(searchCond.getPageSize());
+        pageInfo.setTotal(total);
+
+        List<TopRanking> dataList = new ArrayList<>();
+        for (SearchHit sh : response.getHits().getHits()) {
+            TopRanking tr = new TopRanking();
+            tr = GsonUtils.reConvert2Object(sh.getSourceAsString(), TopRanking.class);
+            dataList.add(tr);
+        }
+        pageInfo.setData(dataList);
+        return pageInfo;
     }
 
     @Override

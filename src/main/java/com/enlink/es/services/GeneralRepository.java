@@ -104,5 +104,7 @@ public interface GeneralRepository<T extends GeneralModel> {
      * @return
      * @throws Exception
      */
-    PageInfo findByPaging(SearchCond searchCond) throws Exception;
+    PageInfo<T> findByPaging(SearchCond searchCond) throws Exception;
+
+
 }

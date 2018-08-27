@@ -1,6 +1,8 @@
 package com.enlink.es.services.impl;
 
 import com.enlink.es.base.IndicesCreateInfo;
+import com.enlink.es.base.PageInfo;
+import com.enlink.es.base.SearchCond;
 import com.enlink.es.config.ElasticsearchConfig;
 import com.enlink.es.models.AppLibrary;
 import com.enlink.es.services.AppLibraryRepository;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 应用库业务层实现
@@ -69,6 +72,32 @@ public class AppLibraryRepositoryImpl extends AbstractGeneralRepository<AppLibra
                         "  }\n" +
                         "}")
                 .create();
+    }
+
+    @Override
+    public PageInfo<AppLibrary> findByPaging(SearchCond searchCond) throws Exception {
+        SearchResponse response = super.findByPagingCondition(searchCond);
+        // 总记录超过10000的，则总是为10000，因为Elasticsearch分页查询只支持10000以内的。
+        long total = 0L;
+        long totalHits = response.getHits().totalHits;
+        if (totalHits < Long.valueOf(getEsConfig().getQueryMaxTotal())) {
+            total = totalHits;
+        }
+        LOGGER.info("Indices Paging Search end!");
+
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setPageIndex(searchCond.getPageIndex());
+        pageInfo.setPageSize(searchCond.getPageSize());
+        pageInfo.setTotal(total);
+
+        List<AppLibrary> dataList = new ArrayList<>();
+        for (SearchHit sh : response.getHits().getHits()) {
+            AppLibrary appLibrary = new AppLibrary();
+            appLibrary = GsonUtils.reConvert2Object(sh.getSourceAsString(), AppLibrary.class);
+            dataList.add(appLibrary);
+        }
+        pageInfo.setData(dataList);
+        return pageInfo;
     }
 
     @Override
